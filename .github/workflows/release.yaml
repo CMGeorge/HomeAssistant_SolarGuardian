@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: Update version and create release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get release version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Release version: $VERSION"
+
+      - name: Update manifest.json version
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          python3 << EOF
+          import json
+          with open('custom_components/solarguardian/manifest.json', 'r') as f:
+              manifest = json.load(f)
+          manifest['version'] = '$VERSION'
+          with open('custom_components/solarguardian/manifest.json', 'w') as f:
+              json.dump(manifest, f, indent=2)
+              f.write('\n')
+          print(f"✓ Updated manifest.json to version $VERSION")
+          EOF
+
+      - name: Commit version bump
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add custom_components/solarguardian/manifest.json
+          git diff --staged --quiet || git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+
+      - name: Validate release
+        run: |
+          echo "✓ Release ${{ steps.version.outputs.version }} validated"
+          echo "✓ manifest.json updated"
+          echo "✓ Ready for HACS distribution"
