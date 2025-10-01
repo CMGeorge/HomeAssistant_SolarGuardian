@@ -4,7 +4,7 @@
 
 **Date**: October 1, 2025, 16:34:21  
 **Test Type**: Real API (No Mocking)  
-**Credentials**: Updated (App Key: [REDACTED]...)
+**Credentials**: [REDACTED]
 
 ---
 
