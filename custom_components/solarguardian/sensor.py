@@ -485,10 +485,17 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         self._attr_name = f"{device['equipmentName']} {sensor_config['name']}"
         self._attr_unique_id = f"{device['id']}_{variable['dataIdentifier']}"
         
+        # Check if this is an enum sensor (has translationChild)
+        has_translation = bool(variable.get("translationChild"))
+        
         # Set sensor attributes
-        self._attr_native_unit_of_measurement = sensor_config.get("unit")
-        self._attr_device_class = sensor_config.get("device_class")
-        self._attr_state_class = sensor_config.get("state_class")
+        # For enum sensors (text values), don't set device_class, state_class, or unit
+        # This tells Home Assistant to treat them as text sensors
+        if not has_translation:
+            self._attr_native_unit_of_measurement = sensor_config.get("unit")
+            self._attr_device_class = sensor_config.get("device_class")
+            self._attr_state_class = sensor_config.get("state_class")
+        
         self._attr_icon = sensor_config.get("icon")
         
         # Device info
