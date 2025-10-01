@@ -1,0 +1,3839 @@
+Solarguardian API
+Table of content
+
+Solarguardian API .................................................................................................................................... 1
+Instructions ..................................................................................................................................... 2
+User ................................................................................................................................................. 5
+1. Obtain user logon credentials ............................................................................................. 5
+Power Station .................................................................................................................................. 7
+1. Query the list of power stations ......................................................................................... 7
+2. Query power station details..............................................................................................12
+Gateway ........................................................................................................................................15
+1. Query gateways ................................................................................................................15
+2. Query gateway details ......................................................................................................22
+Device............................................................................................................................................26
+1. Query device list................................................................................................................26
+2. Query device details..........................................................................................................30
+Organization ..................................................................................................................................35
+1. Query organization list ......................................................................................................35
+Data ...............................................................................................................................................38
+1. Query all parameters under the device ............................................................................38
+2. Query the history of a parameter under a device ............................................................48
+3. Obtain the latest historical data .......................................................................................53
+4. Alarm records ....................................................................................................................58
+5. Obtain the command issuing address ...............................................................................63
+6. Command issuing ..............................................................................................................65
+
+Instructions
+Preparation
+1.Solarguardian platform account
+(1) If you have already registered an account, please log in to the web directly.
+(2) If you have not registered an account, please complete the registration on the web page.
+For Mainland China SolarGuardian,The website link is: https://hncloud.epsolarpv.com/. For
+International SolarGuardian,it’s https://gl.mysolarguardian.com/.
+2.Communication between the server and the device is normal.
+The account has completed the addition of power stations, gateways, and devices, and
+the gateways and devices are online. The device data on the web page is obtained normally,
+which means that the communication between the EPEVER server and the device is normal.
+Please ignore this step.
+If the above situation is not the case, please gradually complete the addition of power
+stations, gateways, and devices to ensure that the settings are correct and the web device
+data is obtained normally. For detailed operation steps, please refer to the "Help Center" "SolarGuardian WEB Operation Manual" on the upper right side of the website, as shown
+below.
+
+3.Request login credentials for the API used
+The user logs in successfully, enters "System Management-Personal Information
+Management-Open API" and applies for API login credentials (appKey and appSecret), as
+shown below.
+
+Throttling limits
+Obtain user logon credentials interface call is limited 10 times a minute.Other Api calls are
+limited 30 times a minute , if the number of calls is exceeded, the service rejects the call.
+
+Domain
+For Mainland China SolarGuardian,It’s openapi.epsolarpv.com.
+For International SolarGuardian,It’s glapi.mysolarguardian.com.
+
+Common error codes
+Error Codes
+
+Description
+
+200
+
+Successful
+
+500
+
+The server has an internal error and cannot
+process the user's request.
+
+5002
+
+No parameters found
+
+5004
+
+Insufficient permissions
+
+5017
+
+Parameter error
+
+5106
+
+Incomplete parameters
+
+5126
+
+Too frequent requests
+
+5144
+
+5148
+
+The system automatically triggers the defense
+mechanism.
+
+The media Type of the message body is
+content-Type.
+
+User
+1. Obtain user logon credentials
+1.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}/epCloud/user/getAuthToken
+
+Transport Protocol
+
+HTTPS
+
+1.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+appKey
+
+body
+
+true
+
+String
+
+appkey
+
+appSecret
+
+body
+
+true
+
+String
+
+appsecret
+
+Content-Type
+
+Headers
+
+true
+
+String
+
+application/json
+
+1.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+the logon credential returned
+when the logon is successful
+
+X-Access-Token
+
+String
+
+(note: The validity period of the
+X-Access-Token is 2 hours
+and can be reused within 2
+hours)
+
+1.4. Sample Requests
+{
+"appKey":"IkBkUKJ3",
+"appSecret":"r6idnix02feykqvysjejjdetq6klh0tp"
+}
+
+1.5. Response example
+{
+"status": 0,
+"data": {
+"X-Access-Token":
+"eyJhdGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXBwS2V5IjoiSWtCa1VLSjIiLCJ1aWQiOjc2NTI3LCJl
+eHAiOjE2OTc3OTIzNzIsImlhdCI6MTY5Nzc4NTE3Mn0.0OdQED0E3Cfa_i11D2kh3SJZ9pqR2SISSPpSkYc1R4"
+},
+"info": "ok"
+}
+
+Power Station
+1. Query the list of power stations
+1.1. Interface prototype
+Request
+method
+
+Request
+address
+
+Transport
+Protocol
+
+POST
+
+https://{Domain}/epCloud/vn/openApi/getPowerStationListPage
+
+HTTPS
+
+1.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+the logon
+credential
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+returned when
+the logon is
+successful.
+
+Content-Type
+
+Headers
+
+true
+
+String
+
+powerStationName
+
+body
+
+false
+
+String
+
+pageNo
+
+body
+
+true
+
+Integer
+
+application/json
+
+name of power
+station
+
+page number
+
+pageSize
+
+body
+
+true
+
+Integer
+
+page size
+
+1.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+data
+
+Map
+
+power station list
+
+1.3.1. Response parameters-data
+Parameter
+
+Type
+
+Description
+
+total
+
+Integer
+
+data-list
+
+List
+
+response object
+
+pageNum
+
+Integer
+
+page number
+
+pageSize
+
+Integer
+
+page size
+
+the number of entries to
+return.
+
+1.3.2. Response parameters-data-list
+Parameter
+
+Type
+
+Description
+
+primary key id of the power
+
+id
+
+Integer
+
+powerStationName
+
+String
+
+name of power station
+
+projectId
+
+Integer
+
+organization
+
+projectName
+
+String
+
+organization name
+
+ename
+
+String
+
+organization name English
+
+position
+
+String
+
+longitude and latitude
+
+address
+
+String
+
+address
+
+imagePath
+
+String
+
+image path
+
+imagePathAll
+
+String
+
+full image path
+
+alarmStatus
+
+String
+
+equipmentCount
+
+Integer
+
+equipmentOnlineCount
+
+String
+
+ownerUid
+
+Integer
+
+registered user ID
+
+ownerUname
+
+String
+
+register a user account
+
+station
+
+power station status (0:
+normal 1: alarm;)
+
+number of equipments
+under the power station
+
+online number of devices
+under the power station
+
+createDt
+
+String
+
+creation time
+
+updateDt
+
+String
+
+modification time
+
+creator
+
+Integer
+
+the id of the creator.
+
+updator
+
+Integer
+
+the id of the modifier.
+
+projectName
+
+String
+
+organization name
+
+ename
+
+String
+
+organization name English
+
+alarmStatus
+
+String
+
+equipmentCount
+
+Integer
+
+equipmentOnlineCount
+
+String
+
+1.4. Sample Requests
+{
+"powerStationName": "",
+"total": 0,
+"pageNo": 1,
+"pageSize": 10
+}
+
+power station status (0:
+normal 1: alarm;)
+
+number of equipments
+under the power station
+
+online number of devices
+under the power station
+
+1.5. Response example
+{
+"status": 0,
+"data": {
+"total": 31,
+"list": [
+{
+"id": 16215,
+"pageNo": 1,
+"pageSize": 10,
+"powerStationName": "Organization Power Station",
+"area": "",
+"ownerName": "",
+"ownerPhone": "",
+"ownerUnit": "",
+"description": "",
+"imagePath": "",
+"positon":"" ,
+"address": "",
+"projectId": 66394,
+"ownerUid": 76535,
+"configurationId": 148965,
+"defaultFlag": 0,
+"createDt": 1694662905000,
+"updateDt": 1694662905000,
+"creator": 76535,
+"old": 0,
+"updator": 76535,
+"projectName": "Organization",
+"ename": "Default Group",
+"alarmStatus": 0,
+"equipmentCount": 0,
+"equipmentOnlineCount": 0,
+"link": "XoyfHaix3SAT",
+"model": 0,
+"type": 0
+}
+]
+}
+
+}
+
+2. Query power station details
+2.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}/epCloud/vn/openApi/getPowerStation
+
+Transport Protocol
+
+HTTPS
+
+2.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+the logon
+credential
+X-Access-Token
+
+headers
+
+true
+
+String
+
+returned when
+the logon is
+successful.
+
+Content-Type
+
+headers
+
+true
+
+String
+
+id
+
+body
+
+true
+
+Integer
+
+application/json
+
+primary key id of
+the power station
+
+2.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+Request method
+
+Integer
+
+result status
+
+Request address
+
+String
+
+response Information
+
+Transport Protocol
+
+Map
+
+power station list
+
+2.3.1. Response parameters-data
+Parameter
+
+Type
+
+Description
+
+id
+
+Integer
+
+powerStationName
+
+String
+
+name of power station
+
+projectId
+
+Integer
+
+organization
+
+ename
+
+Integer
+
+organization English
+
+projectName
+
+String
+
+organization name
+
+description
+
+String
+
+position
+
+String
+
+primary key id of the power
+station
+
+description of Power
+Station
+
+longitude and latitude
+
+address
+
+String
+
+address
+
+imagePath
+
+String
+
+image path
+
+imagePathAll
+
+String
+
+full image path
+
+powerConsumptionTotal
+
+String
+
+powerGenerationTotal
+
+String
+
+ownerUid
+
+Integer
+
+registered user ID
+
+ownerUname
+
+String
+
+register a user account
+
+2.4. Sample Requests
+{
+"id":1
+}
+
+2.5. Response example
+{
+"status": 0,
+"data": {
+"id": 31696,
+"pageNo": 1,
+"pageSize": 10,
+"powerStationName": "lixl Enterprise_1698309023140",
+"area": "1",
+"ownerName": "",
+
+cumulative power
+consumption
+
+cumulative power
+generation
+
+"ownerPhone": "",
+"ownerUnit": "",
+"position": "117.130339,36.675857",
+"address": "",
+"projectId": 66388,
+"ownerUid": 76562,
+"configurationId": 268695,
+"defaultFlag": 0,
+"createDt": 1698309029000,
+"updateDt": 1698309029000,
+"creator": 76562,
+"old": 0,
+"updator": 76562,
+"creatorName": "lixl Enterprise",
+"updatorName": "lixl Enterprise",
+"projectName": "Default Organization",
+"ename": "Default Group",
+"ownerUname": "lixl Enterprise",
+"equipmentCount": 0,
+"powerGenerationTotal": "0.00",
+"powerConsumptionTotal": "0.00",
+"link": "NSBzgFOnyeov",
+"model": 0,
+"type": 0
+},
+"info": "ok",
+"account": "lixl Enterprise"
+}
+
+Gateway
+1. Query gateways
+1.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}/epCloud/vn/openApi/getDevs
+
+Transport Protocol
+
+HTTPS
+
+1.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+search
+search_param
+
+body
+
+true
+
+String
+
+parameters (SN
+or name)
+
+gateway status
+searchByDeviceStatus
+
+body
+
+true
+
+String
+
+(0: offline, 1:
+Online)
+
+page_param
+
+body
+
+true
+
+String
+
+pagination
+parameters
+
+the logon
+credential
+X-Access-Token
+
+Headers
+
+true
+
+String
+
+returned when
+the logon is
+successful.
+
+Content-Type
+
+Headers
+
+true
+
+String
+
+1.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+application/json
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+data
+
+List
+
+gateway array
+
+1.3.1. Response parameters-data
+Parameter
+
+Type
+
+Description
+
+id
+
+Integer
+
+powerStationName
+
+String
+
+name of power station
+
+projectId
+
+Integer
+
+organization
+
+ename
+
+Integer
+
+organization English
+
+projectName
+
+String
+
+organization name
+
+devid
+
+String
+
+gateway SN
+
+name
+
+String
+
+gateway name
+
+address
+
+String
+
+address
+
+imagePath
+
+String
+
+image path
+
+imagePathAll
+
+String
+
+full image path
+
+the primary key id of the
+gateway.
+
+position
+
+String
+
+longitude and latitude
+
+onlineOffline
+
+String
+
+gateway status
+
+ownerUid
+
+Integer
+
+registered user ID
+
+1.4. Sample Requests
+{
+"search_param": "",
+"searchByDeviceStatus": "",
+"page_param": {
+"offset": 0,
+"limit": 10
+}
+}
+
+1.5. Response example
+{
+"status": 0,
+"data": {
+"dev": [
+{
+"ename": "Default Group",
+"old": 0,
+"deviceType": 0,
+"dtype": 0,
+
+"powerStationId": 16214,
+"accessMode": 172,
+"powerStationName": "New Site",
+"accessModeName": "EPEVER TCP 306",
+"id": 217229,
+"devid": "2023021512345678900001",
+"name": "TCP306",
+"pass": "12345678",
+"dictRegion": 1,
+"dictType": "3",
+"imgFull": "https://hncloud.epsolarpv.com/uploads/dictionary/1697629569863_0039.jpg",
+"type": 10,
+"createTime": 1686219035,
+"updateTime": 1702029422,
+"protocol": 101,
+"position": "116.25245277747,40.217927178864",
+"address": "Beijing",
+"onlineStatus": 1,
+"status": 1,
+"sn": "2023021512345678900001",
+"productModel": 0,
+"templateId": 176354,
+"weight": 0,
+"templateName": "undefine_2023-06-08 18:10:35",
+
+"verifyCode": "64la17ok",
+"positionType": 1,
+"virtual": 0,
+"projectId": 66397,
+"projectName": "Default group",
+"mac": "2023021512345678900001",
+"imei": "2023021512345678900001",
+"funcCloud": 1,
+"funcMonitor": 0,
+"deviceStatus": {
+"deviceId": "2023021512345678900001",
+"onlineOffline": 1,
+"sync": 0,
+"datapointAlarm": 0
+},
+"isBindAlarmConfig": 0,
+"configurationDto": {
+"id": 185924,
+"uid": 76571,
+"pageNo": 1,
+"pageSize": 10,
+"link": "6AywiQUuknIC",
+"name": "undefine_configuration_2023-06-08 18:10:35",
+"model": 0,
+
+"thumbnail": "scada/icon_configuration_white_big_temp.png",
+"thumbnailFull":
+"http://hncloud.epsolarpv.com/uploads/scada/icon_configuration_white_big_temp.png",
+"compatibleType": 1,
+"hasContent": 1,
+"hasScreenContent": 1,
+"projectId": 66397,
+"ownerUid": 76571,
+"isOnlyShowOwn": 0,
+"isPcOrAndroid": 0,
+"configurationUserIsolation": false,
+"onlySimpleInfo": false
+},
+"configurationId": 185924,
+"isTransProtocol": 0,
+"loraDeviceType": 0,
+"webConfig": 0,
+"smokeProtocolDevice": false
+}
+}]
+}
+
+2. Query gateway details
+2.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}/epCloud/vn/openApi/getDevice
+
+Transport Protocol
+
+HTTPS
+
+2.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+The logon
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+credential returned
+when the logon is
+successful.
+
+Content-Type
+
+Headers
+
+true
+
+String
+
+deviceId
+
+body
+
+false
+
+String
+
+application/json
+
+gateway serial
+number
+
+2.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+data
+
+Map
+
+gateway Information
+
+2.3.1. Response parameters data-device
+Parameter
+
+Type
+
+Description
+
+name
+
+String
+
+gateway name
+
+deviceId
+
+String
+
+gateway SN
+
+imei
+
+String
+
+imei
+
+address
+
+String
+
+device address
+
+projectName
+
+String
+
+organization name
+
+ename
+
+String
+
+organization name
+
+projectId
+
+Integer
+
+organization Id
+
+onlineOffline
+
+Integer
+
+powerStationName
+
+String
+
+name of power station
+
+powerStationId
+
+Integer
+
+the id of the power station.
+
+accessMode
+
+Integer
+
+The id of the access
+
+gateway online status: 1
+Online 0 offline
+
+method.
+
+accessModeName
+
+String
+
+address
+
+String
+
+2.4. Sample Requests
+{
+"deviceId": "0000000000000000200020",
+}
+
+2.5. Response example
+{
+"status": 0,
+"data": {
+"device": {
+"old": 0,
+"ename": "Default Group",
+"dtype": 0,
+"deviceType": 0,
+"powerStationName": "Real Device Monitoring",
+"accessModeName": "EPEVER-WIFI-2.4G-PCB-D",
+"powerStationId": 20675,
+"accessMode": 218,
+"id": 258265,
+"deviceId": "0000000000000000200020",
+"ownerUid": 76562,
+"name": "Shenzhen WiFi",
+"pass": "icJGLqZD",
+"type": 10,
+"protocol": 101,
+"position": ",",
+
+The name of the access
+method.
+
+gateway address
+
+"address": "",
+"account": "lixl Enterprise",
+"onlineStatus": 1,
+"status": 1,
+"sn": "0000000000000000200020",
+"productModel": 0,
+"templateId": 235068,
+"weight": 0,
+"templateName": "Unnamed_2023-10-30 10:25:14",
+"positionType": 1,
+"virtual": 0,
+"projectId": 66388,
+"projectName": "Default Organization",
+"mac": "202308011424248",
+"imei": "202308011424248",
+"funcCloud": 1,
+"funcMonitor": 0,
+"deviceStatus": {
+"deviceId": "0000000000000000200020",
+"onlineOffline": 1,
+"sync": 0,
+"datapointAlarm": 0
+},
+"dictRegion": 0,
+"dictType": "0"
+},
+"slaveTotal": 1
+},
+"info": "ok",
+"account": "lixl Enterprise"
+}
+
+Device
+1. Query device list
+1.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}/epCloud/vn/openApi/getEquipmentList
+
+Transport Protocol
+
+HTTPS
+
+1.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+The logon
+credential
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+returned when
+the logon is
+successful.
+
+Content-Type
+
+Headers
+
+true
+
+String
+
+application/json
+
+equipmentName
+
+body
+
+false
+
+String
+
+appsecret
+
+powerStationId
+
+body
+
+false
+
+Integer
+
+gatewayId
+
+body
+
+false
+
+Integer
+
+the id of the
+power station.
+
+The id of the
+Gateway.
+
+pageNo
+
+body
+
+false
+
+Integer
+
+Page number
+
+pageSize
+
+body
+
+false
+
+Integer
+
+page number
+
+1.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+data
+
+List
+
+device Array
+
+1.3.1. Response parameters data-list
+Parameter
+
+Type
+
+Description
+
+id
+
+Integer
+
+device primary key id
+
+equipmentName
+
+String
+
+custom Device Name
+
+equipmentNo
+
+String
+
+device serial number
+
+trafficStationNo
+
+String
+
+powerStationId
+
+Integer
+
+device communication station
+number
+
+the id of the power station.
+
+powerStationName
+
+String
+
+name of power station
+
+gatewayId
+
+String
+
+the sn code of the gateway.
+
+gatewayName
+
+String
+
+gateway name
+
+productId
+
+Integer
+
+product Series id
+
+productName
+
+String
+
+product Series name
+
+projectId
+
+Integer
+
+organization id
+
+projectName
+
+String
+
+organization name
+
+ename
+
+String
+
+organization name English
+
+ownerUid
+
+Integer
+
+registered user ID
+
+ownerUname
+
+String
+
+register a user account
+
+createDt
+
+String
+
+creation time
+
+updateDt
+
+String
+
+modification time
+
+creator
+
+Integer
+
+the id of the creator.
+
+updator
+
+Integer
+
+The id of the modifier.
+
+creatorName
+
+String
+
+Creator account
+
+updatorName
+
+String
+
+modify user account
+
+address
+
+String
+
+status
+
+Integer
+
+datapointAlarm
+
+Integer
+
+1.4. Sample Requests
+{
+"equipmentName": "",
+"status": "",
+"powerStationId": "",
+"gatewayId": "",
+"projectId": null,
+"pageNo": 1,
+"pageSize": 9
+}
+
+1.5. Response example
+{
+"status": 0,
+"data": {
+"total": 31,
+"list": [
+{
+"id": 24569,
+"pageNo": 1,
+"pageSize": 10,
+"type": 0,
+"equipmentName": "Equipment060801",
+"equipmentNo": "0000000001686214008515",
+"trafficStationNo": "1",
+
+device address
+
+device status 0: offline, 1:
+online
+
+alarm status 0: alarm, 1:
+normal
+
+"powerStationId": 920,
+"gatewayId": "05083586094N32TM-00198",
+"productId": 478,
+"projectId": 66358,
+"ownerUid": 76535,
+"createDt": 1686214029000,
+"updateDt": 1698819895000,
+"creator": 76535,
+"updator": 76535,
+"creatorName": "lixl Enterprise",
+"updatorName": "lixl Enterprise",
+"powerStationName": "Power Station0608",
+"gatewayName": "Gateway0608",
+"productName": "Adjustable Default Value for Lithium Battery Type Support",
+"productNameE": "Adjustable Default Value for Lithium Battery Type Support",
+"projectName": "Default Organization",
+"ename": "Default Group",
+"ownerUname": "lixl Enterprise",
+"address": "Beijing",
+"status": 1,
+"datapointAlarm": 0,
+"imagePath": "series/1698201266402_0784.png",
+"imagePathAll": "http://x.x.x.x/uploads/series/1698201266402_0784.png",
+"statusPoint": "1",
+"actionInstructionList": [],
+"infoFlag": 0
+}
+]
+}
+}
+
+2. Query device details
+2.1. Interface prototype
+Request method POST
+
+Request
+address
+
+Transport
+Protocol
+
+https://{Domain}/epCloud/vn/openApi/getEquipmentNoVariable
+
+HTTPS
+
+2.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+the logon
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+credential returned
+when the logon is
+successful.
+
+Content-Type
+
+headers
+
+true
+
+String
+
+Id
+
+body
+
+true
+
+Integer
+
+application/json
+
+primary key id of
+the power station
+
+2.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+data
+
+Map
+
+device Details
+
+2.3.1. Response parameters data
+Parameter
+
+Type
+
+Description
+
+id
+
+Integer
+
+device primary key id
+
+equipmentName
+
+String
+
+custom device name
+
+equipmentNo
+
+String
+
+device serial number
+
+trafficStationNo
+
+String
+
+powerStationId
+
+Integer
+
+the id of the power station.
+
+powerStationName
+
+String
+
+name of power station
+
+gatewayId
+
+String
+
+the sn code of the gateway.
+
+gatewayName
+
+String
+
+gateway name
+
+productId
+
+Integer
+
+product Series id
+
+productName
+
+String
+
+product Series name
+
+projectId
+
+Integer
+
+organization id
+
+projectName
+
+String
+
+organization name
+
+ename
+
+String
+
+organization name English
+
+device communication station
+number
+
+ownerUid
+
+Integer
+
+registered user ID
+
+ownerUname
+
+String
+
+register a user account
+
+createDt
+
+String
+
+creation time
+
+updateDt
+
+String
+
+modification time
+
+creator
+
+Integer
+
+the id of the creator.
+
+updator
+
+Integer
+
+the id of the modifier.
+
+creatorName
+
+String
+
+creator account
+
+updatorName
+
+String
+
+modify user account
+
+address
+
+String
+
+device address
+
+status
+
+Integer
+
+datapointAlarm
+
+Integer
+
+2.4. Sample Requests
+{
+"id": 24569
+}
+
+device status 0: offline, 1:
+online
+
+alarm status 0: no alarm, 1:
+normal
+
+2.5. Response example
+{
+"status": 0,
+"data": {
+"id": 24569,
+"pageNo": 1,
+"pageSize": 10,
+"type": 0,
+"equipmentName": "Device060801",
+"equipmentNo": "0000000001686214008515",
+"trafficStationNo": "1",
+"powerStationId": 920,
+"gatewayId": "05083586094N32TM-00198",
+"productId": 478,
+"projectId": 66358,
+"ownerUid": 76535,
+"createDt": 1686214029000,
+"updateDt": 1698819895000,
+"creator": 76535,
+"updator": 76535,
+"creatorName": "lixl Enterprise",
+"updatorName": "lixl Enterprise",
+"powerStationName": "Power Station0608",
+"gatewayName": "Gateway0608",
+"productName": "Supports adjustable default values for lithium battery types",
+"productNameE": "Supports adjustable default values for lithium battery types",
+"projectName": "Default Organization",
+"ename": "Default Group",
+"ownerUname": "lixl Enterprise",
+"address": "Beijing",
+"status": 1,
+"datapointAlarm": 0,
+"imagePath": "series/1698201266402_0784.png",
+"imagePathAll": "http://x.x.x.x/uploads/series/1698201266402_0784.png",
+"infoFlag": 0,
+"protocolType": "2"
+},
+"info": "ok",
+"account": "lixl"
+
+}
+
+Organization
+1. Query organization list
+1.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}/epCloud/vn/openApi/queryOrganizationList
+
+Transport
+Protocol
+
+HTTPS
+
+1.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+the logon
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+credential returned
+when the logon is
+successful.
+
+Content-Type
+
+Headers
+
+true
+
+String
+
+isTree
+
+body
+
+true
+
+String
+
+application/json
+
+Is it a tree
+structure
+
+1.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+id
+
+Integer
+
+organization id
+
+parentId
+
+Integer
+
+parent organization id
+
+projectName
+
+String
+
+organization name
+
+ename
+
+String
+
+organization name
+
+level
+
+Integer
+
+organization level
+
+1.4. Sample Requests
+{
+"isTree": 1
+}
+
+1.5. Response example
+{
+"status": 0,
+"data": [
+{
+"id": 66358,
+
+"children": [
+{
+"id": 66375,
+"parentId": 66358,
+"children": [
+{
+"id": 66394,
+"parentId": 66375,
+"projectName": "Organization011111",
+"ename": "Organization01",
+"createTime": "2022-10-12 18:11:23",
+"ownerUid": 76535,
+"parentIds": ",66358,66375,",
+"level": 3,
+"remarks": ""
+},
+{
+"id": 66459,
+"parentId": 66375,
+"projectName": "Organization02",
+"ename": "Organization02",
+"createTime": "2023-05-24 12:16:03",
+"ownerUid": 76535,
+"parentIds": ",66358,66375,",
+"level": 3,
+"remarks": ""
+}
+],
+"childrenCount": 2,
+"projectName": "Organization1",
+"ename": "Organization1",
+"createTime": "2022-09-05 17:42:29",
+"ownerUid": 76535,
+"parentIds": ",66358,",
+"level": 2,
+"remarks": ""
+}
+],
+"childrenCount": 5,
+"projectName": "Default Organization",
+
+"ename": "Default Group",
+"createTime": "2022-08-02 09:19:40",
+"ownerUid": 76535,
+"level": 1
+}
+],
+"info": "ok",
+"account": "lixl Enterprise"
+}
+
+Data
+1. Query all parameters under the device
+1.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}/epCloud/vn/openApi/getEquipment
+
+Transport Protocol
+
+HTTPS
+
+1.2. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+the logon
+credential
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+returned when the
+logon is
+successful.
+
+Content-Type
+
+headers
+
+true
+
+String
+
+id
+
+body
+
+true
+
+Integer
+
+application/json
+
+device primary
+key id
+
+1.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+data
+
+Map
+
+device Details
+
+1.3.1. Response parameters-data
+Parameter
+
+Type
+
+Description
+
+id
+
+Integer
+
+device primary key id
+
+equipmentName
+
+String
+
+custom device Name
+
+equipmentNo
+
+String
+
+device serial number
+
+trafficStationNo
+
+String
+
+powerStationId
+
+Integer
+
+device communication station
+number
+
+the id of the power station.
+
+powerStationName
+
+String
+
+name of power station
+
+gatewayId
+
+Integer
+
+the sn code of the gateway.
+
+gatewayName
+
+String
+
+gateway name
+
+productId
+
+Integer
+
+product series id
+
+productName
+
+String
+
+product series name
+
+projectId
+
+Integer
+
+organization id
+
+projectName
+
+String
+
+organization name
+
+ownerUid
+
+Integer
+
+registered user ID
+
+ownerUname
+
+String
+
+register a user account
+
+variableGroupList
+
+List
+
+list of variable groups
+
+1.3.2. Response parameters-data-variableGroupList
+Parameter
+
+Type
+
+id
+
+Integer
+
+productId
+
+Integer
+
+Description
+
+parameter group primary
+key ID
+
+product family primary key
+ID
+
+variableGroupNameC
+
+String
+
+parameter group name
+
+variableGroupNameE
+
+String
+
+showSetting
+
+String
+
+Is it displayed?
+
+variableList
+
+List
+
+Variable Set
+
+the English name of the
+parameter group.
+
+1.3.3. Response parameters-data-variableGroupList-variableList
+Parameter
+
+Type
+
+Description
+
+id
+
+Integer
+
+parameter primary key id
+
+productId
+
+Integer
+
+groupId
+
+Integer
+
+variableNameC
+
+String
+
+parameter name
+
+variableNameE
+
+String
+
+parameter name
+
+unit
+
+String
+
+unit
+
+dataIdentifier
+
+String
+
+parameter identifier
+
+register
+
+String
+
+register
+
+product Family primary key
+ID
+
+parameter Group primary
+key ID
+
+address (separated by
+
+address
+
+String
+
+bit1
+
+String
+
+bit2
+
+String
+
+dataFormat
+
+String
+
+data format
+
+decimal
+
+String
+
+decimal point
+
+samplingFrequency
+
+String
+
+acquisition frequency
+
+commas)
+
+start address of multiple
+parameters
+
+end address of multiple
+parameters
+
+read/write mode (0: Readmode
+
+String
+
+only; 1: read/write; 2: write
+only)
+
+boundUp
+
+String
+
+parameter upper limit
+
+boundDown
+
+String
+
+parameter lower limit
+
+listShow
+
+String
+
+chartShow
+
+String
+
+acquisitionFormula
+
+String
+
+collection formula
+
+controlFormula
+
+String
+
+control Formula
+
+whether the list is displayed
+(0: No; 1: yes)
+
+whether the chart is
+displayed (0: No; 1: yes)
+
+parameter value translation
+
+translationChild
+
+List
+
+dataPointId
+
+Integer
+
+parameter point id
+
+deviceNo
+
+String
+
+gateway sn
+
+slaveIndex
+
+String
+
+slave serial number
+
+itemId
+
+String
+
+set
+
+parameter sequence
+number
+
+parameter type (0: Numeric
+type; 1: switch type; 4:
+componentType
+
+String
+
+character type; 6:
+timestamp type; 8:
+positioning type)
+
+* Note: the upper and lower limits of parameters are boundUp (upper limit of parameters)
+and boundDown (lower limit of parameters)。
+
+1.3.4. Response parameters-data-variableGroupList-variableListtranslationChild
+Parameter
+
+Type
+
+id
+
+Integer
+
+variableId
+
+Integer
+
+Description
+
+parameter value translation
+primary key id
+
+parameter primary key id
+
+value
+
+String
+
+parameter value
+
+result
+
+String
+
+translation results
+
+resultE
+
+String
+
+translation results
+
+1.4. Sample Requests
+{
+"id": 24569
+}
+
+1.5. Response example
+{
+"status": 0,
+"data": {
+"id": 24569,
+"pageNo": 1,
+"pageSize": 10,
+"type": 0,
+"equipmentName": "Device060801",
+"equipmentNo": "0000000001686214008515",
+"trafficStationNo": "1",
+"powerStationId": 920,
+"gatewayId": "05083586094N32TM-00198",
+"productId": 478,
+"projectId": 66358,
+"ownerUid": 76535,
+"createDt": 1686214029000,
+"updateDt": 1698819895000,
+"creator": 76535,
+"updator": 76535,
+"creatorName": "lixl Enterprise",
+"updatorName": "lixl Enterprise",
+
+"powerStationName": "Power Station0608",
+"gatewayName": "Gateway0608",
+"productName": "Adjustable Default Value for Lithium Battery Type Support",
+"productNameE": "Adjustable Default Value for Lithium Battery Type Support",
+"projectName": "Default Organization",
+"ename": "Default Group",
+"ownerUname": "lixl Enterprise",
+"address": "Beijing",
+"status": 1,
+"datapointAlarm": 0,
+"imagePath": "series/1698201266402_0784.png",
+"imagePathAll": "http://x.x.x.x/uploads/series/1698201266402_0784.png",
+"variableGroupList": [
+{
+"id": 6483,
+"pageNo": 1,
+"pageSize": 10,
+"productId": 478,
+"variableGroupNameC": "Product Information",
+"variableGroupNameE": "Product Information",
+"showSetting": "1",
+"type": "7",
+"sort": "3.00",
+"createDt": 1698201885000,
+"updateDt": 1698201885000,
+"creator": 76431,
+"updator": 76431,
+"creatorName": "huineng",
+"updatorName": "huineng",
+"imagePath": "",
+"status": "0",
+"variableList": [
+{
+"id": 82137,
+"pageNo": 1,
+"pageSize": 10,
+"productId": 478,
+"groupId": 6483,
+"type": "0",
+"variableNameC": "Current Rated Voltage Level",
+
+"variableNameE": "Current Rated Voltage Level",
+"unit": "V",
+"dataIdentifier": "crtrattedbatvolt",
+"register": "3",
+"address": "12574",
+"bit1": "",
+"bit2": "",
+"dataFormat": "ushort",
+"decimal": "0",
+"samplingFrequency": "60",
+"mode": "0",
+"listShow": "0",
+"chartShow": "0",
+"acquisitionFormula": "%s/100",
+"controlFormula": "%s*100",
+"sort": "0.00",
+"pageShowConfig": "4",
+"createDt": 1698201885000,
+"updateDt": 1698397867000,
+"creator": 76431,
+"updator": 76431,
+"creatorName": "huineng",
+"updatorName": "huineng",
+"bitmap": "",
+"platformShowConfig": "0",
+"platformEditConfig": "",
+"variableType": "8",
+"translationChild": [],
+"dataPointId": 6917307,
+"deviceNo": "05083586094N32TM-00198",
+"slaveIndex": "10",
+"itemId": "0",
+"componentType": "0",
+"relevanceFlag": 0
+},
+{
+"id": 82138,
+"pageNo": 1,
+"pageSize": 10,
+"productId": 478,
+
+"groupId": 6483,
+"type": "0",
+"variableNameC": "Battery Rated Voltage",
+"variableNameE": "Battery Rated Voltage",
+"unit": "V",
+"dataIdentifier": "VLEVELFilter",
+"register": "3",
+"address": "12293",
+"dataFormat": "ushort",
+"decimal": "0",
+"samplingFrequency": "600",
+"mode": "0",
+"acquisitionFormula": "%s/100",
+"controlFormula": "",
+"sort": "1.00",
+"pageShowConfig": "4",
+"createDt": 1698201885000,
+"updateDt": 1698201885000,
+"creator": 76431,
+"updator": 76431,
+"creatorName": "xx",
+"updatorName": "xxx",
+"bitmap": "",
+"platformShowConfig": "0",
+"platformEditConfig": "",
+"variableType": "8",
+"translationChild": [],
+"dataPointId": 6917309,
+"deviceNo": "05083586094N32TM-00198",
+"slaveIndex": "10",
+"itemId": "2",
+"componentType": "0",
+"relevanceFlag": 0
+}
+]
+}
+],
+"statusPoint": "1",
+"infoFlag": 0,
+"protocolType": "2"
+
+},
+"info": "ok",
+"account": "lixl Enterprise"
+}
+
+2. Query the history of a parameter under a device
+2.1. Interface prototype
+Request
+method
+
+Request
+address
+
+Transport
+Protocol
+
+POST
+
+https://{Domain}/epCloud/vn/openApi/getDeviceDataPointHistory
+
+HTTPS
+
+2.2. Call limit
+
+
+The number of single queries shall not exceed 10
+
+
+
+The historical records of a single parameter in a single query shall not exceed
+5,000
+
+2.3. Request parameters
+Parameter
+
+Location
+
+Must Pass
+
+Type
+
+Remarks
+
+the logon credential
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+returned when the
+logon is successful.
+
+Content-Type
+
+Headers
+
+true
+
+String
+
+application/json
+
+devDatapoints
+
+body
+
+true
+
+String
+
+parameter point list
+
+deviceNo
+
+body
+
+true
+
+String
+
+gateway SN
+
+slaveIndex
+
+body
+
+true
+
+String
+
+itemId
+
+body
+
+true
+
+String
+
+dataPointId
+
+body
+
+true
+
+Integer
+
+start
+
+body
+
+true
+
+Long
+
+start time
+
+end
+
+body
+
+true
+
+Long
+
+end time
+
+pageNo
+
+body
+
+true
+
+Integer
+
+page number
+
+pageSize
+
+body
+
+true
+
+Integer
+
+page size
+
+device
+communication ID
+
+parameter ID
+
+parameter primary
+key id
+
+2.4. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+data
+
+List
+
+parameter list
+
+deviceNo
+
+String
+
+gateway SN
+
+slaveIndex
+
+String
+
+device Communication ID
+
+dataPointId
+
+Integer
+
+parameter primary key id
+
+list
+
+List
+
+time
+
+Long
+
+parameter working time
+
+value
+
+String
+
+parameter value
+
+pageSize
+
+Integer
+
+page size
+
+pageNum
+
+Integer
+
+page number
+
+total
+
+Integer
+
+total number of entries
+
+the historical value of the
+current parameter.
+
+2.5. Sample Requests
+Step 1： Call the interface（query all parameters under the device） to obtain key
+parameters: deviceNo，slaveIndex，itemId，dataPointId
+
+Step 2: Call this interface, enter the time period to be queried, and get the history record.
+
+{
+"devDatapoints": [
+{
+"deviceNo": "05083586094N32TM-00198",
+"slaveIndex": "10",
+"itemId": "2",
+"dataPointId": 6917309
+}
+],
+"pageNo": 1,
+"start": 1509452562000,
+"end": 1509456852000,
+"pageSize": 1,
+"timeSort": "desc"
+
+}
+
+2.6. Response example
+{
+"status": 0,
+"data": {
+"list": [
+{
+"deviceNo": "05083586094N32TM-00198",
+"slaveIndex": "10",
+"itemId": "2",
+"dataPointId": 6917309,
+"total": 862,
+"list": [
+{
+"value": "24.0",
+"time": 1699319814503
+}
+]
+}
+],
+"total": 862,
+"pageNum": 1,
+"pageSize": 1
+},
+"info": "",
+"account": "lixl"
+}
+
+3. Obtain the latest historical data
+3.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}:7002/history/lastDatapoint
+
+Transport Protocol HTTPS
+
+3.2. Request parameters
+Parameter
+
+Location
+
+Required
+
+Type
+
+Remarks
+
+The logon
+credential
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+returned when
+the logon is
+successful.
+
+Content-Type
+
+headers
+
+true
+
+String
+
+dataPoints
+
+body
+
+true
+
+list
+
+Remarks
+
+Request parameters（dataPoints）
+
+Parameter
+
+Required
+
+Type
+
+deviceNo
+
+true
+
+String
+
+Gateway sn
+
+dataPointId
+
+true
+
+Integer
+
+Parameter id
+
+application/jso
+n
+
+Parameter list
+
+3.3. Response parameters
+Parameter
+
+Required
+
+Remarks
+
+status
+
+Integer
+
+Result status
+
+info
+
+String
+
+Response Information
+
+dataPointId
+
+Integer
+
+Parameter id
+
+deviceNo
+
+String
+
+Gateway sn
+
+value
+
+String
+
+parameter
+
+time
+
+String
+
+Parameter point reporting time
+
+error
+
+Integer
+
+Error code
+
+3.4. Sample Requests
+Step 1： Call the interface（query all parameters under the device） to obtain key
+parameters: deviceNo，dataPointId
+
+Step 2: Set dataPoint Data in the body.
+{
+"devDatapoints":[
+{
+"dataPointId": 101754260,
+"deviceNo": "2023021512345678900001"
+},
+{
+"deviceNo": "2023021512345678900001",
+"dataPointId": 101754282
+}
+]
+}
+
+3.5. Response example
+
+{
+"data": {
+"list": [
+{
+"slaveName": "XTRA-N-10",
+"deviceName": "TCP 306",
+
+"dataPointName": “Daily Generation",
+"dataPointId": 101754260,
+"deviceNo": "2023021512345678900001",
+"error": 0,
+"templateDataPointId": 102804581,
+"value": "0.00",
+"time": 1705479748496
+},
+{
+"slaveName": "XTRA-N-10",
+"deviceName": "TCP 306",
+"dataPointName": “Monthly Generation",
+"dataPointId": 101754282,
+"deviceNo": "2023021512345678900001",
+"error": 0,
+"templateDataPointId": 102804603,
+"value": "0.00",
+"time": 1705479748496
+}
+]
+},
+"info": "",
+
+"status": 0
+}
+
+4. Alarm records
+4.1. Interface prototype
+Request method
+
+POST
+
+Request address
+
+https://{Domain}/epCloud/vn/openApi/getAlarmHistory
+
+Transport Protocol
+
+HTTPS
+
+4.2. Request parameters
+Must
+
+Parameter
+
+Location
+
+X-Access-Token
+
+headers
+
+true
+
+String
+
+Content-Type
+
+Headers
+
+true
+
+String
+
+application/json
+
+controlDeviceName
+
+body
+
+false
+
+String
+
+device/product series name
+
+datapointName
+
+body
+
+false
+
+String
+
+variable name
+
+timeStart
+
+body
+
+false
+
+Long
+
+start timestamp
+
+timeEnd
+
+body
+
+false
+
+Long
+
+end timestamp
+
+Pass
+
+Type
+
+Remarks
+
+the logon credential returned
+when the logon is successful.
+
+alarmType
+
+body
+
+false
+
+Integer
+
+alarm status: 0: normal 1:
+Alarm
+
+processing Status: 0:
+status
+
+body
+
+false
+
+Integer
+
+unprocessed 1: False positive
+2: confirm processing
+(completed)
+
+pageNo
+
+body
+
+false
+
+Integer
+
+page count
+
+pageSize
+
+body
+
+false
+
+Integer
+
+number of Entries
+
+equipmentId
+
+body
+
+false
+
+Integer
+
+device Id
+
+4.3. Response parameters
+Parameter
+
+Type
+
+Description
+
+status
+
+Integer
+
+result status
+
+info
+
+String
+
+response Information
+
+hid
+
+String
+
+unique primary key
+
+deviceName
+
+String
+
+gateway name
+
+dataid
+
+Integer
+
+data point Id
+
+content
+
+String
+
+alarm content
+
+contentEn
+
+String
+
+alarm content in English
+
+createTime
+
+Long
+
+creation time
+
+equipmentName
+
+String
+
+device Name
+
+equipmentId
+
+String
+
+device id
+
+maintenance
+
+String
+
+cause
+
+maintenanceE
+
+String
+
+alarm due to English
+
+powerStationId
+
+Integer
+
+the Id of the power station.
+
+powerStationName
+
+String
+
+Name of power station
+
+pointEnName
+
+String
+
+parameter name
+
+triggerName
+
+String
+
+trigger Chinese name
+
+triggerNameE
+
+String
+
+trigger name
+
+translationName
+
+String
+
+translationNameE
+
+String
+
+parameter translation value
+name
+
+parameter translation value
+English name
+
+4.4. Sample Requests
+{
+"alarmType": 0,
+"controlDeviceName": "",
+"equipmentId": "",
+"datapointName": "",
+"alarmState": "",
+"status": "",
+"pageSize": 10,
+"pageNo": 1,
+"timeStart": 1696695179,
+"timeEnd": 1699287179,
+"loraFlag": 0
+}
+
+4.5. Response example
+{
+"status": 0,
+"data": {
+"total": 88,
+"list": [
+{
+"id": 0,
+"hid": "BMNAcIsB5UnwviZk-Hm7",
+"did": "05020316094BYKSS-00171",
+"deviceName": "Test Device",
+"dataid": 7967264,
+"datapointName": "Load Switch Control",
+"value": 1.0,
+"content": "1",
+"contentEn": "1",
+"createTime": 1698395387,
+"generateTime": 1698395387,
+"alarmState": 1,
+"status": 0,
+
+"description": "",
+"processTime": 0,
+"slaveIndex": "1",
+"slaveName": "Test Device",
+"handleMode": "",
+"handle": 0,
+"uid": 76535,
+"triggerid": 39831,
+"alarmType": 0,
+"controlTemplateName": "",
+"triggerName": "Unnamed_Custom Alarm_67",
+"triggerType": 3,
+"sceneId": 0,
+"pointEnName": "Load ON/OFF",
+"triggerNameE": "Unnamed_Custom Alarm_67",
+"translationName": "Load Switch On",
+"maintenanceE": "Switch ON",
+"translationNameE": "Load Switch On",
+"sceneName": "",
+"dataSourceName": "",
+"dataSourceId": "",
+"controlSceneId": 0,
+"controlSceneName": "",
+"controlDataSourceName": "",
+"controlDataSourceId": "",
+"equipmentId": 84164,
+"equipmentName": "Test Device",
+"alarmNoticeManages": "[]",
+"maintenance": "Switch ON",
+"powerStationId": 920,
+"powerStationName": "Power Station0608"
+}
+],
+"pageNum": 1,
+"pageSize": 10,
+"size": 0,
+"startRow": 0,
+"endRow": 0,
+"pages": 9,
+"prePage": 0,
+
+"nextPage": 2,
+"isFirstPage": true,
+"isLastPage": false,
+"hasPreviousPage": false,
+"hasNextPage": true,
+"navigatePages": 8,
+"navigatepageNums": [1, 2, 3, 4, 5, 6, 7, 8],
+"navigateFirstPage": 1,
+"navigateLastPage": 8,
+"firstPage": 1,
+"lastPage": 8
+},
+"info": "ok",
+"account": "lixl Enterprise"
+}
+
+5. Obtain the command issuing address
+5.1. Brief description
+Send the address according to the get Command
+
+5.2. Request URL
+https://{Domain}/epCloud/vn/ucloudSdk/getCommandAddress
+
+5.3. Request method
+POST
+
+5.4. Request parameters
+Name
+
+Required/optional
+
+Type
+
+Location
+
+Description
+
+X-AccessToken
+
+The logon credential
+Required
+
+String
+
+Header
+
+returned when the
+logon is successful.
+
+The media type of the
+Content-Type
+
+required
+
+String
+
+Header
+
+message body, which
+must
+be"application/json”
+
+5.5. Response parameters
+Name
+
+Type
+
+Description
+
+data
+
+JSONObject
+
+command delivery address
+
+info
+
+String
+
+prompt message
+
+status
+
+Integer
+
+return code
+
+Response Data（data）
+
+Name
+
+Type
+
+Description
+
+commandServerAddr
+
+String
+
+command delivery address
+
+5.6. Response description
+Return code
+
+description
+
+0
+
+Successful
+
+1526
+
+failed to obtain the token.
+
+5.7. Sample Requests
+POST https://{Domain}/epCloud/vn/ucloudSdk/getCommandAddress
+Content-Type: application/json
+
+{
+
+}
+
+5.8. Response example
+Content-Type: application/json
+
+{
+"status": 0,
+"data": {
+"commandServerAddr": "https://xxx.xxx.xxx:xxx"
+},
+"info": "ok"
+}
+
+6. Command issuing
+6.1. Overview
+Users can send data to devices through http requests. Currently, only data points and
+passthrough data are supported.Each user can send up to 10 pieces of data per second. The
+server does not process the excess data and returns an error code.
+
+6.2. Procedure
+1. Obtain X-Access-Token
+2. obtain the pushed url. For more information, see documentation. Obtain the command
+issuing address , note: this interface has a frequency limit. It can be reused after being
+obtained once without frequent acquisition.
+3. Push command data according to interface specifications (as follows)
+4. Type：post ；Protocol Type：https
+
+6.3. http interface specifications
+Field
+
+Description
+
+url: Obtain the command issuing address
+type: Enumeration， type is datapoint
+URL
+
+{url}/v1.0/{type}/{deviceId}
+
+deviceId:gateway sn
+Example：
+http://8.140.24.94:8001/v1.0/dataPoint/0123456789abc
+
+heade
+
+As follows
+
+r
+
+X-Access-Token
+
+Content-Type
+
+body
+
+5.
+
+Located in the header and obtained through interface
+Obtain X-Access-Token
+
+application/json
+
+Json Format
+
+6.4. Parameter settings
+Type
+
+Content
+
+Type
+
+body
+
+setDataPoint
+
+array
+
+Description
+
+the content is as
+follows:
+
+slaveName
+
+string
+
+Device Name
+
+dataPointId
+
+string
+
+Parameter Id
+
+value
+
+string
+
+data
+
+Response example:
+Step 1: Obtain X-Access-Token
+
+Step 2:Obtain the command issuing address,get the command issuing address :
+http://8.140.24.94:8001.
+
+Step 3:get deviceId(gateway SN).
+Option 1：In the Gateway list, see the SNs of all gateways. Get the SN of the gateway
+corresponding to the device.
+
+Option 2：
+
+Step 4：Splice out the URL and set the header.
+
+Step 5:get slaveName (device name).
+In the Device list, see all devices and get the device name.
+
+Step 6:get dataPointId (Parameter Id).
+In the device list, click the Overview of the device to enter the device data page and find the
+parameter ID corresponding to the parameter that needs to be set.
+
+Step 7: Set parameters in the Body of the interface
+{
+"setDataPoint": [
+{
+"slaveName": "TRACER-AN",
+" dataPointId ":"101443681",
+"value": "190"
+}
+
+]
+
+}
+
+Step 8: Request the interface and set the Battery Capacity to 190Ah.
+Request the interface and set the Battery Capacity to 190Ah. The returned status is 200,
+indicating that the setting is successful. If the status returns other values, please refer to the
+error code table to find the reason.
+
+6.5. Error Codes
+http response code
+
+error Codes
+
+404
+
+description
+
+page not found
+
+500
+
+500
+
+Internal server error
+
+429
+
+10001
+
+Frequency out of limit
+
+401
+
+10003
+
+authorized failed
+
+413
+
+10004
+
+too large content
+
+400
+
+10005
+
+param format error
+
+description
+
+The page cannot be
+found.
+
+Internal Server Error
+
+the frequency exceeds
+the limit.
+
+Permission verification
+failed.
+
+The data content is too
+large.
+
+The parameter format
+is incorrect.
+
+

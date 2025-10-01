@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "SolarGuardian Configuration",
+        "description": "Configure your SolarGuardian integration",
+        "data": {
+          "domain": "API Domain",
+          "app_key": "App Key",
+          "app_secret": "App Secret"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid authentication credentials. Please check your App Key and App Secret.",
+      "unknown": "Unexpected error occurred. Please try again."
+    },
+    "abort": {
+      "already_configured": "This SolarGuardian account is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SolarGuardian Options",
+        "description": "Configure update settings",
+        "data": {
+          "update_interval": "Update interval (seconds)"
+        }
+      }
+    }
+  }
+}
