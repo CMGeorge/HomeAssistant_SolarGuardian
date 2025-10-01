@@ -528,6 +528,8 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                             "Sensor %s (%s) got value from latest_data: %s",
                             self.name, data_identifier, value
                         )
+                        self._last_valid_value = value
+                        self._value_source = "latest_data"
                         return value
                     except (ValueError, TypeError) as err:
                         _LOGGER.warning(
@@ -559,16 +561,28 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                                     "Sensor %s (%s) got value from variable.%s: %s",
                                     self.name, data_identifier, value_field, value
                                 )
+                                self._last_valid_value = value
+                                self._value_source = f"variable.{value_field}"
                                 return value
                             except (ValueError, TypeError):
                                 # Try returning as-is if not numeric
                                 return variable[value_field]
         
         # Log when we can't find any value
+        if self._last_valid_value is not None:
+            # Return last known value if we have one
+            _LOGGER.debug(
+                "No current value for sensor %s (%s) in device %s - using last known value: %s",
+                self.name, data_identifier, device_name, self._last_valid_value
+            )
+            self._value_source = "last_known (stale)"
+            return self._last_valid_value
+        
         _LOGGER.debug(
-            "No value found for sensor %s (%s) in device %s - check if latest_data is enabled",
+            "No value found for sensor %s (%s) in device %s - parameter not in latest_data",
             self.name, data_identifier, device_name
         )
+        self._value_source = "none"
         return None
 
     @property
@@ -596,6 +610,36 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         if any(diag in data_identifier for diag in DIAGNOSTIC_SENSORS):
             return EntityCategory.DIAGNOSTIC
         return None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return additional state attributes."""
+        attrs = {
+            "data_identifier": self._variable.get("dataIdentifier"),
+            "variable_name": self._variable.get("variableName"),
+            "data_source": self._value_source or "none",
+        }
+        
+        # Add parameter info for diagnostic purposes
+        if self._variable.get("dataPointId"):
+            attrs["data_point_id"] = self._variable["dataPointId"]
+        if self._variable.get("unit"):
+            attrs["api_unit"] = self._variable["unit"]
+        
+        # Show if parameter has real-time data available
+        device_id = self._device["id"]
+        device_data = self.coordinator.data.get("device_data", {}).get(device_id, {})
+        latest_data = device_data.get("latest_data", {})
+        if latest_data.get("data", {}).get("list"):
+            has_latest = any(
+                dp.get("dataIdentifier") == self._variable.get("dataIdentifier")
+                for dp in latest_data["data"]["list"]
+            )
+            attrs["has_latest_data"] = has_latest
+            if not has_latest:
+                attrs["info"] = "Parameter not included in real-time updates"
+        
+        return attrs
 
     @callback
     def _handle_coordinator_update(self) -> None:
