@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     UnitOfElectricCurrent,
@@ -25,6 +26,14 @@ from . import SolarGuardianDataUpdateCoordinator
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
+
+# Sensors that should be marked as diagnostic (technical/debug info)
+DIAGNOSTIC_SENSORS = [
+    "SerialNumber", "DeviceSerialNumber", "GatewayID", "GatewaySN",
+    "FirmwareVersion", "HardwareVersion", "ProtocolVersion",
+    "RegisterAddress", "ModbusAddress", "DeviceAddress",
+    "CommunicationStatus", "SignalStrength", "DataQuality",
+]
 
 # Mapping of parameter identifiers to sensor configurations
 # Based on the actual SolarGuardian API parameter names
@@ -495,9 +504,11 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
     def native_value(self) -> str | float | None:
         """Return the native value of the sensor."""
         device_id = self._device["id"]
+        device_name = self._device.get("equipmentName", "Unknown")
         device_data = self.coordinator.data.get("device_data", {}).get(device_id, {})
         
         if not device_data:
+            _LOGGER.debug("No device data available for %s (ID: %s)", device_name, device_id)
             return None
 
         data_identifier = self._variable["dataIdentifier"]
@@ -513,26 +524,51 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                         decimal = self._variable.get("decimal", "0")
                         if decimal and decimal.isdigit():
                             value = value / (10 ** int(decimal))
+                        _LOGGER.debug(
+                            "Sensor %s (%s) got value from latest_data: %s",
+                            self.name, data_identifier, value
+                        )
                         return value
-                    except (ValueError, TypeError):
+                    except (ValueError, TypeError) as err:
+                        _LOGGER.warning(
+                            "Failed to convert value for %s: %s (error: %s)",
+                            data_identifier, data_point.get("value"), err
+                        )
                         return data_point.get("value")
+        else:
+            _LOGGER.debug(
+                "No latest_data available for %s - latest_data status: %s",
+                device_name,
+                "present but empty" if "latest_data" in device_data else "not present"
+            )
 
         # Fallback to checking variable configuration data
         for group in device_data.get("data", {}).get("variableGroupList", []):
             for variable in group.get("variableList", []):
                 if variable.get("dataIdentifier") == data_identifier:
-                    # Check if there's a current value in the variable
-                    if "currentValue" in variable:
-                        try:
-                            value = float(variable["currentValue"])
-                            # Apply decimal formatting if specified
-                            decimal = variable.get("decimal", "0")
-                            if decimal and decimal.isdigit():
-                                value = value / (10 ** int(decimal))
-                            return value
-                        except (ValueError, TypeError):
-                            return variable["currentValue"]
+                    # Try multiple value fields
+                    for value_field in ["currentValue", "value", "defaultValue"]:
+                        if value_field in variable:
+                            try:
+                                value = float(variable[value_field])
+                                # Apply decimal formatting if specified
+                                decimal = variable.get("decimal", "0")
+                                if decimal and decimal.isdigit():
+                                    value = value / (10 ** int(decimal))
+                                _LOGGER.debug(
+                                    "Sensor %s (%s) got value from variable.%s: %s",
+                                    self.name, data_identifier, value_field, value
+                                )
+                                return value
+                            except (ValueError, TypeError):
+                                # Try returning as-is if not numeric
+                                return variable[value_field]
         
+        # Log when we can't find any value
+        _LOGGER.debug(
+            "No value found for sensor %s (%s) in device %s - check if latest_data is enabled",
+            self.name, data_identifier, device_name
+        )
         return None
 
     @property
@@ -551,6 +587,15 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         
         # Fallback to coordinator success status
         return self.coordinator.last_update_success
+
+    @property
+    def entity_category(self) -> EntityCategory | None:
+        """Return the entity category if this is a diagnostic sensor."""
+        data_identifier = self._variable.get("dataIdentifier", "")
+        # Check if this sensor should be marked as diagnostic
+        if any(diag in data_identifier for diag in DIAGNOSTIC_SENSORS):
+            return EntityCategory.DIAGNOSTIC
+        return None
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -608,3 +653,8 @@ class SolarGuardianDeviceInfoSensor(CoordinatorEntity, SensorEntity):
                     break
         
         return self._value
+
+    @property
+    def entity_category(self) -> EntityCategory | None:
+        """Return entity category - device info sensors are diagnostic."""
+        return EntityCategory.DIAGNOSTIC
