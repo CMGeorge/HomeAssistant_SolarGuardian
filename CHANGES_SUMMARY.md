@@ -1,3 +1,34 @@
+# SolarGuardian Integration - Changes Summary
+## October 1, 2025 Session - COMPLETE
+
+## 🎯 Issues Addressed
+
+### 1. Sensors Showing "Unknown"
+**User Report:** Most sensors showing "Unknown" except device info sensors (Serial, Gateway, Location, etc.)
+
+**Root Cause:** API returns **43 out of 79 parameters** with real-time data. The remaining 36 are configuration/static values that don't update in real-time. **This is normal API behavior.**
+
+**Solution:** Enhanced sensor handling with state attributes and last-known-value storage.
+
+### 2. Entity Organization
+**User Question:** "Should some sensors be moved to Diagnostics section?"
+
+**Solution:** Implemented `EntityCategory.DIAGNOSTIC` for:
+- Device info sensors (Serial, Gateway ID, Product Name, Location, Status)
+- Technical parameters (RegisterAddress, FirmwareVersion, etc.)
+- Main measurement sensors stay in primary view
+
+### 3. Control Capabilities
+**User Question:** "Are there no Controls available based on the API?"
+
+**Discovery:** ✅ **YES! API fully supports control commands!**
+- Switches (Load ON/OFF)
+- Numbers (Battery capacity, voltage thresholds)
+- Rate limit: 10 commands/second
+- Full implementation guide created
+
+---
+
 # Changes Summary - October 1, 2025
 
 ## ✅ Completed Tasks

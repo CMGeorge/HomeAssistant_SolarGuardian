@@ -528,8 +528,10 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                             "Sensor %s (%s) got value from latest_data: %s",
                             self.name, data_identifier, value
                         )
-                        self._last_valid_value = value
-                        self._value_source = "latest_data"
+                        if hasattr(self, '_last_valid_value'):
+                            self._last_valid_value = value
+                        if hasattr(self, '_value_source'):
+                            self._value_source = "latest_data"
                         return value
                     except (ValueError, TypeError) as err:
                         _LOGGER.warning(
@@ -561,28 +563,33 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                                     "Sensor %s (%s) got value from variable.%s: %s",
                                     self.name, data_identifier, value_field, value
                                 )
-                                self._last_valid_value = value
-                                self._value_source = f"variable.{value_field}"
+                                if hasattr(self, '_last_valid_value'):
+                                    self._last_valid_value = value
+                                if hasattr(self, '_value_source'):
+                                    self._value_source = f"variable.{value_field}"
                                 return value
                             except (ValueError, TypeError):
                                 # Try returning as-is if not numeric
                                 return variable[value_field]
         
         # Log when we can't find any value
-        if self._last_valid_value is not None:
+        # Check if attribute exists (backward compatibility with existing sensors)
+        if hasattr(self, '_last_valid_value') and self._last_valid_value is not None:
             # Return last known value if we have one
             _LOGGER.debug(
                 "No current value for sensor %s (%s) in device %s - using last known value: %s",
                 self.name, data_identifier, device_name, self._last_valid_value
             )
-            self._value_source = "last_known (stale)"
+            if hasattr(self, '_value_source'):
+                self._value_source = "last_known (stale)"
             return self._last_valid_value
         
         _LOGGER.debug(
             "No value found for sensor %s (%s) in device %s - parameter not in latest_data",
             self.name, data_identifier, device_name
         )
-        self._value_source = "none"
+        if hasattr(self, '_value_source'):
+            self._value_source = "none"
         return None
 
     @property
@@ -617,7 +624,7 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         attrs = {
             "data_identifier": self._variable.get("dataIdentifier"),
             "variable_name": self._variable.get("variableName"),
-            "data_source": self._value_source or "none",
+            "data_source": getattr(self, '_value_source', None) or "none",
         }
         
         # Add parameter info for diagnostic purposes
