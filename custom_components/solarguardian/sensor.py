@@ -428,6 +428,18 @@ async def _setup_sensors_from_data(
                     data_identifier = variable.get("dataIdentifier")
                     if not data_identifier:
                         continue
+                    
+                    # Skip configuration parameters (mode="1")
+                    # These are device settings that are not provided by the latest_data endpoint
+                    # mode="0" = real-time sensor (has values)
+                    # mode="1" = configuration parameter (no values from API)
+                    variable_mode = variable.get("mode", "0")
+                    if variable_mode == "1":
+                        _LOGGER.debug(
+                            "Skipping configuration parameter: %s (mode=1, not readable via API)",
+                            variable.get("variableNameE", data_identifier)
+                        )
+                        continue
                         
                     if data_identifier in SENSOR_TYPES:
                         entities.append(
