@@ -2,6 +2,16 @@
 
 A comprehensive Home Assistant integration for Epever Solar inverters using the SolarGuardian API V2.3.
 
+[![Validate](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions/workflows/validate.yaml/badge.svg)](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions/workflows/validate.yaml)
+[![hassfest](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions/workflows/hassfest.yaml)
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![GitHub release](https://img.shields.io/github/release/CMGeorge/HomeAssistant_SolarGuardian.svg)](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/releases)
+[![License](https://img.shields.io/github/license/CMGeorge/HomeAssistant_SolarGuardian.svg)](LICENSE)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=CMGeorge&repository=HomeAssistant_SolarGuardian&category=integration)
+
+---
+
 ## Features
 
 - Real-time monitoring of solar inverter parameters
@@ -12,21 +22,28 @@ A comprehensive Home Assistant integration for Epever Solar inverters using the 
 - Historical data access
 - Compatible with Home Assistant 2025.9.x
 
+---
+
 ## Installation
 
 ### Via HACS (Recommended)
 
-1. Add this repository to HACS as a custom repository
-2. Install "SolarGuardian" integration
-3. Restart Home Assistant
-4. Go to Settings > Devices & Services
-5. Click "Add Integration" and search for "SolarGuardian"
+1. In Home Assistant, go to **HACS → Integrations → Custom Repositories**
+2. Add this repository: `https://github.com/CMGeorge/HomeAssistant_SolarGuardian`
+3. Choose category: **Integration**
+4. Install "SolarGuardian" integration
+5. Restart Home Assistant
+6. Go to **Settings > Devices & Services**
+7. Click "**Add Integration**" and search for "**SolarGuardian**"
 
 ### Manual Installation
 
-1. Copy the `custom_components/solarguardian` folder to your Home Assistant's `custom_components` directory
-2. Restart Home Assistant
-3. Add the integration via the UI
+1. Download the [latest release](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/releases)
+2. Copy the `custom_components/solarguardian` folder to your Home Assistant's `custom_components` directory
+3. Restart Home Assistant
+4. Add the integration via the UI
+
+---
 
 ## Configuration
 
@@ -39,6 +56,8 @@ A comprehensive Home Assistant integration for Epever Solar inverters using the 
    - Domain: Use `openapi.epsolarpv.com` for Mainland China or `glapi.mysolarguardian.com` for International
    - Enter your appKey and appSecret
    - Select update interval (default: 30 seconds)
+
+---
 
 ## Supported Entities
 
@@ -63,11 +82,22 @@ The integration respects SolarGuardian API rate limits:
 - 10 calls per minute for authentication
 - Automatic retry with exponential backoff
 
+---
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
+
+---
+
 ## Support
 
-- GitHub Issues: Report bugs and feature requests
-- Home Assistant Community: Discuss usage and troubleshooting
+- **GitHub Issues**: [Report bugs and feature requests](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/issues)
+- **Documentation**: Check our [Troubleshooting Guide](TROUBLESHOOTING.md)
+- **Security**: See our [Security Policy](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/security/policy)
+
+---
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - see [LICENSE](LICENSE) file for details
