@@ -23,9 +23,12 @@
     "step": {
       "init": {
         "title": "SolarGuardian Options",
-        "description": "Configure update settings",
+        "description": "Configure how often to fetch solar data. Lower intervals provide more real-time data but may exceed API rate limits (30 calls/minute). Recommended: 15s for single device, 30s+ for multiple devices.",
         "data": {
-          "update_interval": "Update interval (seconds)"
+          "update_interval": "Update interval (seconds, min: 15, max: 300)"
+        },
+        "data_description": {
+          "update_interval": "Update interval in seconds (15-300). Lower values provide more frequent updates but increase API usage. API rate limit: 30 calls/minute. Recommended: 15s for single device, 30s+ for multiple devices to avoid rate limiting."
         }
       }
     }

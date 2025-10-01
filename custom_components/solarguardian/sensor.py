@@ -149,6 +149,43 @@ SENSOR_TYPES = {
         "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:current-dc",
     },
+    # Device Information Sensors (Text)
+    "_device_serial": {
+        "name": "Serial Number",
+        "icon": "mdi:identifier",
+        "device_class": None,
+        "state_class": None,
+    },
+    "_device_gateway": {
+        "name": "Gateway ID",
+        "icon": "mdi:router-wireless",
+        "device_class": None,
+        "state_class": None,
+    },
+    "_device_gateway_name": {
+        "name": "Gateway Name",
+        "icon": "mdi:router-wireless",
+        "device_class": None,
+        "state_class": None,
+    },
+    "_device_product": {
+        "name": "Product Name",
+        "icon": "mdi:information",
+        "device_class": None,
+        "state_class": None,
+    },
+    "_device_location": {
+        "name": "Location",
+        "icon": "mdi:map-marker",
+        "device_class": None,
+        "state_class": None,
+    },
+    "_device_status_text": {
+        "name": "Status",
+        "icon": "mdi:information",
+        "device_class": None,
+        "state_class": None,
+    },
     # Temperature sensors
     "BatteryTemperature": {
         "name": "Battery Temperature",
@@ -348,6 +385,30 @@ async def _setup_sensors_from_data(
                 _LOGGER.warning("No parameter data available for device %s", device_name)
                 continue
 
+            # Add device information sensors (Serial, Gateway, Location, etc.)
+            # These are text sensors showing device metadata
+            device_info_sensors = [
+                ("_device_serial", device.get("equipmentNo", "Unknown")),
+                ("_device_gateway", device.get("gatewayId", "Unknown")),
+                ("_device_gateway_name", device.get("gatewayName", "Unknown")),
+                ("_device_product", device.get("productName", device.get("productNameE", "Unknown"))),
+                ("_device_location", device.get("address", "Unknown")),
+                ("_device_status_text", "Online" if device.get("status") == 1 else "Offline"),
+            ]
+            
+            for sensor_id, sensor_value in device_info_sensors:
+                if sensor_id in SENSOR_TYPES and sensor_value != "Unknown":
+                    entities.append(
+                        SolarGuardianDeviceInfoSensor(
+                            coordinator,
+                            device,
+                            sensor_id,
+                            SENSOR_TYPES[sensor_id],
+                            sensor_value,
+                        )
+                    )
+                    device_sensors += 1
+
             # Create sensors for each parameter group
             device_sensors = 0
             for group in device_data.get("data", {}).get("variableGroupList", []):
@@ -427,6 +488,58 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             "model": device.get("productName", "Solar Inverter"),
             "sw_version": device.get("version"),
         }
+
+
+class SolarGuardianDeviceInfoSensor(CoordinatorEntity, SensorEntity):
+    """Representation of a SolarGuardian device information sensor (text)."""
+
+    def __init__(
+        self,
+        coordinator: SolarGuardianDataUpdateCoordinator,
+        device: dict[str, Any],
+        sensor_id: str,
+        sensor_config: dict[str, Any],
+        value: str,
+    ) -> None:
+        """Initialize the device info sensor."""
+        super().__init__(coordinator)
+        
+        self._device = device
+        self._sensor_id = sensor_id
+        self._sensor_config = sensor_config
+        self._value = value
+        self._attr_name = f"{device['equipmentName']} {sensor_config['name']}"
+        self._attr_unique_id = f"{device['id']}{sensor_id}"
+        
+        # Set sensor attributes (text sensors have no unit/device_class)
+        self._attr_icon = sensor_config.get("icon")
+        
+        # Device info
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, str(device["id"]))},
+            "name": device["equipmentName"],
+            "manufacturer": "Epever",
+            "model": device.get("productName", "Solar Inverter"),
+            "sw_version": device.get("version"),
+        }
+
+    @property
+    def native_value(self) -> str:
+        """Return the value of the sensor."""
+        # Update value from coordinator if device status changed
+        device_id = self._device["id"]
+        devices_data = self.coordinator.data.get("devices", {})
+        
+        for station_id, devices in devices_data.items():
+            for device in devices.get("data", {}).get("list", []):
+                if device["id"] == device_id:
+                    # Update dynamic values
+                    if self._sensor_id == "_device_status_text":
+                        return "Online" if device.get("status") == 1 else "Offline"
+                    # For static values, return stored value
+                    break
+        
+        return self._value
 
     @property
     def native_value(self) -> str | float | None:
