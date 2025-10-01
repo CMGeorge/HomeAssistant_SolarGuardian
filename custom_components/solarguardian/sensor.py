@@ -385,6 +385,9 @@ async def _setup_sensors_from_data(
                 _LOGGER.warning("No parameter data available for device %s", device_name)
                 continue
 
+            # Initialize device sensor counter
+            device_sensors = 0
+
             # Add device information sensors (Serial, Gateway, Location, etc.)
             # These are text sensors showing device metadata
             device_info_sensors = [
@@ -410,7 +413,6 @@ async def _setup_sensors_from_data(
                     device_sensors += 1
 
             # Create sensors for each parameter group
-            device_sensors = 0
             for group in device_data.get("data", {}).get("variableGroupList", []):
                 group_name = group.get("variableGroupNameE", group.get("variableGroupNameC", "Unknown"))
                 for variable in group.get("variableList", []):
