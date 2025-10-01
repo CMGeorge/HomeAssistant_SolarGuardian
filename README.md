@@ -89,13 +89,16 @@ The integration respects SolarGuardian API rate limits:
 If you find this integration useful, consider supporting its development:
 
 - ⭐ **Star this repository** on GitHub
-- ☕ **[Buy me a coffee](https://www.buymeacoffee.com/yourusername)** (one-time donation)
-- 💝 **[Sponsor on GitHub](https://github.com/sponsors/CMGeorge)** (monthly support)
+- 💝 **[Sponsor on GitHub](https://github.com/sponsors/CMGeorge)** - Support ongoing development (no fees!)
 - 🐛 **Report bugs** and suggest features
 - 📖 **Improve documentation**
 - 🔧 **Contribute code**
 
 Your support helps maintain and improve this integration! 🙏
+
+### Development
+
+This integration was developed through collaboration between human expertise and AI assistance (GitHub Copilot). All code is reviewed, tested, and maintained to ensure quality and security.
 
 ## 🤝 Contributing
 
