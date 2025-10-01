@@ -4,12 +4,19 @@ Enhanced test script for SolarGuardian API with detailed data display.
 This script performs REAL API calls (not mocked) and shows actual values retrieved.
 
 Usage:
-    # Set environment variables
-    export SOLARGUARDIAN_DOMAIN=glapi.mysolarguardian.com
-    export SOLARGUARDIAN_APP_KEY=your_app_key
-    export SOLARGUARDIAN_APP_SECRET=your_app_secret
+    # Option 1: Use .env file (recommended)
+    # Create tests/.env with:
+    #   APP_KEY=your_app_key
+    #   APP_SECRET=your_app_secret
+    #   DOMAIN=glapi.mysolarguardian.com
     
-    # Run the script
+    # Option 2: Set environment variables
+    export APP_KEY=your_app_key
+    export APP_SECRET=your_app_secret
+    export DOMAIN=glapi.mysolarguardian.com
+    
+    # Run the script from tests directory
+    cd tests
     python run_real_api_tests.py
 """
 
@@ -20,6 +27,20 @@ import os
 import sys
 from typing import Optional
 from datetime import datetime
+from pathlib import Path
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Load .env from tests directory
+    env_path = Path(__file__).parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+        print(f"✅ Loaded credentials from {env_path}")
+    else:
+        print(f"⚠️  No .env file found at {env_path}")
+except ImportError:
+    print("⚠️  python-dotenv not installed, will use environment variables only")
 
 # Set up logging
 logging.basicConfig(
@@ -27,11 +48,14 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# Add custom components to path
-sys.path.insert(0, 'custom_components')
+# Import API modules using wrapper to avoid Home Assistant dependencies
+from test_api_wrapper import load_api_modules
 
-from solarguardian.api import SolarGuardianAPI, SolarGuardianAPIError
-from solarguardian.const import DOMAIN_CHINA, DOMAIN_INTERNATIONAL
+api_module, const_module = load_api_modules()
+SolarGuardianAPI = api_module.SolarGuardianAPI
+SolarGuardianAPIError = api_module.SolarGuardianAPIError
+DOMAIN_CHINA = const_module.DOMAIN_CHINA
+DOMAIN_INTERNATIONAL = const_module.DOMAIN_INTERNATIONAL
 
 
 def print_separator(char='=', length=100):
@@ -162,8 +186,9 @@ async def test_real_api_with_details(domain: str, app_key: str, app_secret: str)
                 print(f"   - API Status: {params_response.get('status')}")
                 print(f"   - Parameter Groups: {len(variable_groups)}")
                 
-                # Collect all data identifiers
+                # Collect all data identifiers and datapoints
                 all_data_identifiers = []
+                all_dev_datapoints = []
                 
                 # Display each parameter group
                 for group_idx, group in enumerate(variable_groups, 1):
@@ -183,15 +208,19 @@ async def test_real_api_with_details(domain: str, app_key: str, app_secret: str)
                         data_id = var.get("dataIdentifier", "")
                         unit = var.get("unit", "")
                         decimal = var.get("decimal", "0")
+                        data_point_id = var.get("dataPointId")
+                        device_no = var.get("deviceNo")
                         
                         print(f"\n      Parameter {var_idx}: {var_name}")
                         print(f"         Data Identifier: {data_id}")
+                        print(f"         Data Point ID: {data_point_id}")
+                        print(f"         Device No: {device_no}")
                         print(f"         Unit: {unit}")
                         print(f"         Decimals: {decimal}")
                         
                         # Show all variable fields
                         for key, value in var.items():
-                            if key not in ['variableNameE', 'variableNameC', 'dataIdentifier', 'unit', 'decimal']:
+                            if key not in ['variableNameE', 'variableNameC', 'dataIdentifier', 'unit', 'decimal', 'dataPointId', 'deviceNo']:
                                 print(f"         {key}: {value}")
                         
                         if data_id:
@@ -201,24 +230,35 @@ async def test_real_api_with_details(domain: str, app_key: str, app_secret: str)
                                 'unit': unit,
                                 'decimal': decimal
                             })
+                        
+                        # Collect datapoints for the correct API method
+                        if data_point_id and device_no:
+                            all_dev_datapoints.append({
+                                'dataPointId': data_point_id,
+                                'deviceNo': device_no,
+                                'name': var_name,
+                                'unit': unit,
+                                'decimal': decimal
+                            })
                 
                 # ==================================================
-                # STEP 5: Get Latest Data for Parameters
+                # STEP 5: Get Latest Data for Parameters (Using Correct Method)
                 # ==================================================
-                if all_data_identifiers:
+                if all_dev_datapoints:
+                    # Use the CORRECT API method with dataPointId and deviceNo
                     # Get latest data for up to 15 parameters at a time
                     batch_size = 15
                     
-                    for batch_idx in range(0, len(all_data_identifiers), batch_size):
-                        batch = all_data_identifiers[batch_idx:batch_idx + batch_size]
-                        batch_ids = [item['id'] for item in batch]
+                    for batch_idx in range(0, len(all_dev_datapoints), batch_size):
+                        batch = all_dev_datapoints[batch_idx:batch_idx + batch_size]
+                        dev_datapoints_batch = [{'dataPointId': dp['dataPointId'], 'deviceNo': dp['deviceNo']} for dp in batch]
                         
                         print_section(f"STEP 5.{station_idx}.{device_idx}.{batch_idx//batch_size + 1}: Fetching Latest Data (Batch {batch_idx//batch_size + 1})")
-                        print(f"Making API call: get_latest_data({device_id}, {len(batch_ids)} parameters)...")
-                        print(f"Parameters: {', '.join(batch_ids[:5])}{'...' if len(batch_ids) > 5 else ''}")
+                        print(f"Making API call: get_latest_data_by_datapoints with {len(dev_datapoints_batch)} datapoints...")
+                        print(f"First datapoint: dataPointId={batch[0]['dataPointId']}, deviceNo={batch[0]['deviceNo']}")
                         
                         try:
-                            latest_response = await api.get_latest_data(device_id, batch_ids)
+                            latest_response = await api.get_latest_data_by_datapoints(dev_datapoints_batch)
                             
                             print("\n📊 RAW API RESPONSE:")
                             print_json_pretty(latest_response)
@@ -232,15 +272,22 @@ async def test_real_api_with_details(domain: str, app_key: str, app_secret: str)
                             print(f"\n💡 ACTUAL SENSOR VALUES (Real-time from API):")
                             
                             for data_point in latest_list:
+                                # The response may have dataPointId or dataIdentifier
+                                data_point_id = data_point.get("dataPointId")
                                 identifier = data_point.get("dataIdentifier", "Unknown")
                                 value = data_point.get("value", "N/A")
                                 
-                                # Find parameter info
-                                param_info = next((p for p in batch if p['id'] == identifier), None)
+                                # Find parameter info by dataPointId or dataIdentifier
+                                param_info = None
+                                if data_point_id:
+                                    param_info = next((p for p in batch if p.get('dataPointId') == data_point_id), None)
+                                if not param_info and identifier:
+                                    param_info = next((p for p in batch if p.get('name') == identifier), None)
+                                
                                 if param_info:
                                     param_name = param_info['name']
                                     unit = param_info['unit']
-                                    decimal_places = int(param_info['decimal'])
+                                    decimal_places = int(param_info.get('decimal', '0'))
                                     
                                     # Format value with proper decimals
                                     try:
@@ -250,14 +297,16 @@ async def test_real_api_with_details(domain: str, app_key: str, app_secret: str)
                                     
                                     print(f"\n   📊 {param_name}")
                                     print(f"      Identifier: {identifier}")
+                                    print(f"      DataPointId: {data_point_id}")
                                     print(f"      Value: {formatted_value} {unit}")
                                     
                                     # Show all data point fields
                                     for key, val in data_point.items():
-                                        if key not in ['dataIdentifier', 'value']:
+                                        if key not in ['dataIdentifier', 'value', 'dataPointId']:
                                             print(f"      {key}: {val}")
                                 else:
-                                    print(f"\n   📊 {identifier}: {value}")
+                                    print(f"\n   📊 DataPointId: {data_point_id}, Identifier: {identifier}")
+                                    print(f"      Value: {value}")
                                     for key, val in data_point.items():
                                         if key not in ['dataIdentifier', 'value']:
                                             print(f"      {key}: {val}")
@@ -299,10 +348,10 @@ async def test_real_api_with_details(domain: str, app_key: str, app_secret: str)
 
 def load_test_credentials() -> Optional[tuple]:
     """Load test credentials from environment or config file."""
-    # Try environment variables first
-    domain = os.getenv("SOLARGUARDIAN_DOMAIN")
-    app_key = os.getenv("SOLARGUARDIAN_APP_KEY") or os.getenv("APPKEY")
-    app_secret = os.getenv("SOLARGUARDIAN_APP_SECRET") or os.getenv("APPSECRET")
+    # Try environment variables (including from .env file)
+    domain = os.getenv("DOMAIN") or os.getenv("SOLARGUARDIAN_DOMAIN")
+    app_key = os.getenv("APP_KEY") or os.getenv("SOLARGUARDIAN_APP_KEY") or os.getenv("APPKEY")
+    app_secret = os.getenv("APP_SECRET") or os.getenv("SOLARGUARDIAN_APP_SECRET") or os.getenv("APPSECRET")
     
     if domain and app_key and app_secret:
         return (domain, app_key, app_secret)
@@ -339,11 +388,15 @@ async def main():
     if not credentials or not all(credentials):
         print("❌ No test credentials found\n")
         print("To run REAL API tests, you need to provide your actual SolarGuardian credentials:\n")
-        print("Option 1: Set environment variables:")
-        print("   export SOLARGUARDIAN_DOMAIN=glapi.mysolarguardian.com")
-        print("   export SOLARGUARDIAN_APP_KEY=your_actual_app_key")
-        print("   export SOLARGUARDIAN_APP_SECRET=your_actual_app_secret\n")
-        print("Option 2: Create test_config.json file:")
+        print("Option 1: Create tests/.env file (RECOMMENDED):")
+        print("   APP_KEY=your_actual_app_key")
+        print("   APP_SECRET=your_actual_app_secret")
+        print("   DOMAIN=glapi.mysolarguardian.com\n")
+        print("Option 2: Set environment variables:")
+        print("   export APP_KEY=your_actual_app_key")
+        print("   export APP_SECRET=your_actual_app_secret")
+        print("   export DOMAIN=glapi.mysolarguardian.com\n")
+        print("Option 3: Create test_config.json file:")
         print("   {")
         print('     "domain": "glapi.mysolarguardian.com",')
         print('     "app_key": "your_actual_app_key",')

@@ -167,8 +167,9 @@ class SolarGuardianAPI:
                 if data.get("status") != 0:
                     error_msg = data.get("info", "Unknown error")
                     if data.get("status") == 5126:  # Too frequent requests
-                        _LOGGER.warning("Rate limit exceeded, backing off")
-                        await asyncio.sleep(5)
+                        _LOGGER.error("API rate limit exceeded! The integration is making too many requests.")
+                        _LOGGER.error("Please increase the update interval in integration options (recommended: 30+ seconds for multiple devices).")
+                        await asyncio.sleep(10)  # Back off longer
                     raise SolarGuardianAPIError(f"API error: {error_msg}")
                 
                 return data
@@ -218,24 +219,57 @@ class SolarGuardianAPI:
     async def get_latest_data(self, device_id: int, data_identifiers: list[str]) -> dict:
         """Get latest data for specific parameters.
         
-        Note: The original endpoint /epCloud/vn/openApi/getLastDataPoint appears to not exist.
-        This is a fallback implementation that may not work with all APIs.
+        Note: This endpoint uses port 7002 as specified in the API documentation.
         """
+        if not data_identifiers:
+            raise SolarGuardianAPIError("No data identifiers provided")
+        
+        # Use the correct endpoint with port 7002 as specified in API docs
+        await self.authenticate()
+        await self._rate_limit_data()
+        
+        session = await self._get_session()
+        
+        # Parse domain to get host without protocol
+        domain_parts = self.domain.replace("https://", "").replace("http://", "")
+        latest_data_url = f"https://{domain_parts}:{LATEST_DATA_PORT}{ENDPOINT_LATEST_DATA}"
+        
+        headers = {
+            "Content-Type": "application/json",
+            "X-Access-Token": self._token,
+        }
+        
         payload = {
             "id": device_id,
             "dataIdentifiers": data_identifiers,
         }
         
+        _LOGGER.debug("Making latest data request to %s for device %d with %d identifiers", latest_data_url, device_id, len(data_identifiers))
+        
         try:
-            return await self._make_authenticated_request(ENDPOINT_LATEST_DATA, payload)
-        except SolarGuardianAPIError as err:
-            if "404" in str(err):
-                # The endpoint doesn't exist, which is common
-                _LOGGER.debug("Latest data endpoint not available (404 error): %s", err)
-                raise SolarGuardianAPIError(f"Latest data endpoint not available: {err}") from err
-            else:
-                # Re-raise other API errors
-                raise
+            async with session.post(latest_data_url, json=payload, headers=headers) as response:
+                if response.status != 200:
+                    if response.status == 404:
+                        _LOGGER.debug("Latest data endpoint not available (404 error)")
+                        raise SolarGuardianAPIError(f"Latest data endpoint not available: HTTP {response.status}")
+                    raise SolarGuardianAPIError(f"Latest data API request failed: {response.status}")
+                
+                data = await response.json()
+                
+                if data.get("status") != 0:
+                    error_msg = data.get("info", "Unknown error")
+                    if data.get("status") == 5126:  # Too frequent requests
+                        _LOGGER.error("API rate limit exceeded during latest data request!")
+                        _LOGGER.error("Please increase the update interval in integration options (recommended: 30+ seconds for multiple devices).")
+                        await asyncio.sleep(10)  # Back off longer
+                    raise SolarGuardianAPIError(f"Latest data API error: {error_msg}")
+                
+                return data
+                
+        except aiohttp.ClientError as err:
+            raise SolarGuardianAPIError(f"Network error during latest data request: {err}") from err
+        except json.JSONDecodeError as err:
+            raise SolarGuardianAPIError(f"Invalid JSON response from latest data endpoint: {err}") from err
     
     async def get_latest_data_by_datapoints(self, dev_datapoints: list[dict]) -> dict:
         """Get latest data using the correct API endpoint with dataPointId and deviceNo.
@@ -280,8 +314,9 @@ class SolarGuardianAPI:
                 if data.get("status") != 0:
                     error_msg = data.get("info", "Unknown error")
                     if data.get("status") == 5126:  # Too frequent requests
-                        _LOGGER.warning("Rate limit exceeded, backing off")
-                        await asyncio.sleep(5)
+                        _LOGGER.error("API rate limit exceeded during latest data request!")
+                        _LOGGER.error("Please increase the update interval in integration options (recommended: 30+ seconds for multiple devices).")
+                        await asyncio.sleep(10)  # Back off longer
                     raise SolarGuardianAPIError(f"Latest data API error: {error_msg}")
                 
                 return data

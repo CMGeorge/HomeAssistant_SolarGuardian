@@ -116,7 +116,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         default=self.config_entry.options.get(
                             CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
                         ),
-                    ): vol.All(vol.Coerce(int), vol.Range(min=15, max=300)),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=5, max=300)),
                 }
             ),
         )

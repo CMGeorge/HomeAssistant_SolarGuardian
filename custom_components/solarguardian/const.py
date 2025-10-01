@@ -10,7 +10,7 @@ CONF_UPDATE_INTERVAL = "update_interval"
 CONF_TEST_MODE = "test_mode"
 
 # Default values
-DEFAULT_UPDATE_INTERVAL = 30  # seconds
+DEFAULT_UPDATE_INTERVAL = 15  # seconds - safe for most installations, respects 30 calls/minute API limit
 DEFAULT_TIMEOUT = 30  # seconds
 
 # API domains

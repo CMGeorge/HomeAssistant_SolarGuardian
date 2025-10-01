@@ -394,61 +394,32 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
                                 
                                 if dev_datapoints:
                                     try:
-                                        # First try the new endpoint
+                                        # Use the correct method with dataPointId and deviceNo
+                                        _LOGGER.debug("Fetching latest data for device %s with %d datapoints", device_name, len(dev_datapoints))
                                         latest_data = await self.api.get_latest_data_by_datapoints(dev_datapoints)
                                         data["device_data"][device_id]["latest_data"] = latest_data
                                         latest_count = len(latest_data.get("data", {}).get("list", []))
-                                        _LOGGER.debug("Retrieved %d latest values for device %s using new endpoint", latest_count, device_name)
+                                        _LOGGER.debug("Retrieved %d latest values for device %s", latest_count, device_name)
                                         # Reset failure counter on success
                                         self._latest_data_failures = 0
                                     except SolarGuardianAPIError as latest_err:
-                                        # If new endpoint fails, try fallback to old method if we have data identifiers
-                                        if "404" in str(latest_err) or "Failed to connect" in str(latest_err):
-                                            _LOGGER.debug("New latest data endpoint failed for device %s, trying fallback method", device_name)
-                                            
-                                            # Extract data identifiers for fallback
-                                            data_identifiers = []
-                                            for group in variable_groups:
-                                                for variable in group.get("variableList", []):
-                                                    if variable.get("dataIdentifier"):
-                                                        data_identifiers.append(variable["dataIdentifier"])
-                                            
-                                            if data_identifiers:
-                                                try:
-                                                    latest_data = await self.api.get_latest_data(device_id, data_identifiers)
-                                                    data["device_data"][device_id]["latest_data"] = latest_data
-                                                    latest_count = len(latest_data.get("data", {}).get("list", []))
-                                                    _LOGGER.debug("Retrieved %d latest values for device %s using fallback endpoint", latest_count, device_name)
-                                                    # Reset failure counter on success
-                                                    self._latest_data_failures = 0
-                                                except SolarGuardianAPIError as fallback_err:
-                                                    if "404" in str(fallback_err):
-                                                        self._latest_data_failures += 1
-                                                        if self._latest_data_failures >= self._max_latest_data_failures:
-                                                            self._latest_data_disabled = True
-                                                            _LOGGER.warning("Both latest data endpoints consistently return 404 errors, disabling latest data fetching")
-                                                        else:
-                                                            _LOGGER.debug("Both latest data endpoints not available for device %s (404 error, attempt %d/%d)", 
-                                                                        device_name, self._latest_data_failures, self._max_latest_data_failures)
-                                                    else:
-                                                        error_msg = f"Failed to get latest data for device {device_name} (fallback): {fallback_err}"
-                                                        _LOGGER.warning(error_msg)
-                                                        data["update_summary"]["errors"].append(error_msg)
-                                            else:
-                                                self._latest_data_failures += 1
-                                                if self._latest_data_failures >= self._max_latest_data_failures:
-                                                    self._latest_data_disabled = True
-                                                    _LOGGER.warning("Latest data endpoints not available and no fallback data, disabling latest data fetching")
+                                        error_msg = f"Failed to get latest data for device {device_name}: {latest_err}"
+                                        _LOGGER.warning(error_msg)
+                                        
+                                        # Track failures and disable if too many
+                                        if "404" in str(latest_err) or "inner error" in str(latest_err).lower():
+                                            self._latest_data_failures += 1
+                                            if self._latest_data_failures >= self._max_latest_data_failures:
+                                                self._latest_data_disabled = True
+                                                _LOGGER.warning("Latest data endpoint consistently failing (%d failures), disabling", self._latest_data_failures)
                                         else:
-                                            error_msg = f"Failed to get latest data for device {device_name}: {latest_err}"
-                                            _LOGGER.warning(error_msg)
                                             data["update_summary"]["errors"].append(error_msg)
                                     except Exception as latest_err:
                                         error_msg = f"Failed to get latest data for device {device_name}: {latest_err}"
                                         _LOGGER.warning(error_msg)
                                         data["update_summary"]["errors"].append(error_msg)
                                 else:
-                                    _LOGGER.debug("No dataPointId/deviceNo found for device %s, skipping latest data (API might not support latest data)", device_name)
+                                    _LOGGER.debug("No dataPointId/deviceNo found for device %s, skipping latest data", device_name)
                             elif self._latest_data_disabled:
                                 _LOGGER.debug("Latest data fetching disabled for device %s due to repeated failures", device_name)
                                         
