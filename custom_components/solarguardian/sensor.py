@@ -512,12 +512,14 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             return None
 
         data_identifier = self._variable["dataIdentifier"]
+        data_point_id = self._variable.get("dataPointId")
         
         # First try to get value from latest data
+        # NOTE: latest_data response uses dataPointId, not dataIdentifier!
         latest_data = device_data.get("latest_data", {})
-        if latest_data.get("data", {}).get("list"):
+        if latest_data.get("data", {}).get("list") and data_point_id:
             for data_point in latest_data["data"]["list"]:
-                if data_point.get("dataIdentifier") == data_identifier:
+                if data_point.get("dataPointId") == data_point_id:
                     try:
                         value = float(data_point.get("value", 0))
                         # Apply decimal formatting if specified
