@@ -17,7 +17,7 @@ jobs:
         python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -47,7 +47,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch'  # Only run manually
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
