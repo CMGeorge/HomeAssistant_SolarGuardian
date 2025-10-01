@@ -1,0 +1,19 @@
+# Code owners for this repository
+# These users will be automatically requested for review when a PR is opened
+
+# Default owners for everything
+* @CMGeorge
+
+# Specific component ownership
+/custom_components/solarguardian/ @CMGeorge
+/.github/ @CMGeorge
+/tests/ @CMGeorge
+
+# Documentation
+*.md @CMGeorge
+/README.md @CMGeorge
+/INSTALLATION.md @CMGeorge
+
+# Configuration files
+/hacs.json @CMGeorge
+/custom_components/solarguardian/manifest.json @CMGeorge
