@@ -500,6 +500,27 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             "sw_version": device.get("version"),
         }
 
+    def _translate_value(self, value: float, translation_child: list) -> str | None:
+        """Translate numeric value to text using translationChild mappings.
+        
+        Args:
+            value: Numeric value from sensor (e.g., 0, 1, 2)
+            translation_child: List of translation mappings from API
+            
+        Returns:
+            Translated text value (e.g., "Not Charging") or None if no match
+        """
+        # Convert value to string for comparison (API uses string values in translations)
+        value_str = str(int(value))  # Convert 0.0 to "0", 1.0 to "1", etc.
+        
+        for translation in translation_child:
+            if translation.get("value") == value_str:
+                # Use English result if available, fallback to Chinese
+                return translation.get("resultE") or translation.get("result")
+        
+        # No translation found
+        return None
+
     @property
     def native_value(self) -> str | float | None:
         """Return the native value of the sensor."""
@@ -521,11 +542,26 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             for data_point in latest_data["data"]["list"]:
                 if data_point.get("dataPointId") == data_point_id:
                     try:
+                        # NOTE: latest_data values are ALREADY formatted with decimals applied
+                        # The API returns "50.00" not "5000", so we use the value as-is
                         value = float(data_point.get("value", 0))
-                        # Apply decimal formatting if specified
-                        decimal = self._variable.get("decimal", "0")
-                        if decimal and decimal.isdigit():
-                            value = value / (10 ** int(decimal))
+                        
+                        # Check if this parameter has translation mappings (enum values)
+                        translation_child = self._variable.get("translationChild", [])
+                        if translation_child:
+                            # Value needs to be translated (e.g., 0 -> "Not Charging")
+                            translated_value = self._translate_value(value, translation_child)
+                            if translated_value is not None:
+                                _LOGGER.debug(
+                                    "Sensor %s (%s) got translated value from latest_data: %s -> %s",
+                                    self.name, data_identifier, value, translated_value
+                                )
+                                if hasattr(self, '_last_valid_value'):
+                                    self._last_valid_value = translated_value
+                                if hasattr(self, '_value_source'):
+                                    self._value_source = "latest_data (translated)"
+                                return translated_value
+                        
                         _LOGGER.debug(
                             "Sensor %s (%s) got value from latest_data: %s",
                             self.name, data_identifier, value
