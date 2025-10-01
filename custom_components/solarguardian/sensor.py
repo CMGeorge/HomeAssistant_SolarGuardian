@@ -491,58 +491,6 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             "sw_version": device.get("version"),
         }
 
-
-class SolarGuardianDeviceInfoSensor(CoordinatorEntity, SensorEntity):
-    """Representation of a SolarGuardian device information sensor (text)."""
-
-    def __init__(
-        self,
-        coordinator: SolarGuardianDataUpdateCoordinator,
-        device: dict[str, Any],
-        sensor_id: str,
-        sensor_config: dict[str, Any],
-        value: str,
-    ) -> None:
-        """Initialize the device info sensor."""
-        super().__init__(coordinator)
-        
-        self._device = device
-        self._sensor_id = sensor_id
-        self._sensor_config = sensor_config
-        self._value = value
-        self._attr_name = f"{device['equipmentName']} {sensor_config['name']}"
-        self._attr_unique_id = f"{device['id']}{sensor_id}"
-        
-        # Set sensor attributes (text sensors have no unit/device_class)
-        self._attr_icon = sensor_config.get("icon")
-        
-        # Device info
-        self._attr_device_info = {
-            "identifiers": {(DOMAIN, str(device["id"]))},
-            "name": device["equipmentName"],
-            "manufacturer": "Epever",
-            "model": device.get("productName", "Solar Inverter"),
-            "sw_version": device.get("version"),
-        }
-
-    @property
-    def native_value(self) -> str:
-        """Return the value of the sensor."""
-        # Update value from coordinator if device status changed
-        device_id = self._device["id"]
-        devices_data = self.coordinator.data.get("devices", {})
-        
-        for station_id, devices in devices_data.items():
-            for device in devices.get("data", {}).get("list", []):
-                if device["id"] == device_id:
-                    # Update dynamic values
-                    if self._sensor_id == "_device_status_text":
-                        return "Online" if device.get("status") == 1 else "Offline"
-                    # For static values, return stored value
-                    break
-        
-        return self._value
-
     @property
     def native_value(self) -> str | float | None:
         """Return the native value of the sensor."""
@@ -608,3 +556,55 @@ class SolarGuardianDeviceInfoSensor(CoordinatorEntity, SensorEntity):
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         self.async_write_ha_state()
+
+
+class SolarGuardianDeviceInfoSensor(CoordinatorEntity, SensorEntity):
+    """Representation of a SolarGuardian device information sensor (text)."""
+
+    def __init__(
+        self,
+        coordinator: SolarGuardianDataUpdateCoordinator,
+        device: dict[str, Any],
+        sensor_id: str,
+        sensor_config: dict[str, Any],
+        value: str,
+    ) -> None:
+        """Initialize the device info sensor."""
+        super().__init__(coordinator)
+        
+        self._device = device
+        self._sensor_id = sensor_id
+        self._sensor_config = sensor_config
+        self._value = value
+        self._attr_name = f"{device['equipmentName']} {sensor_config['name']}"
+        self._attr_unique_id = f"{device['id']}{sensor_id}"
+        
+        # Set sensor attributes (text sensors have no unit/device_class)
+        self._attr_icon = sensor_config.get("icon")
+        
+        # Device info
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, str(device["id"]))},
+            "name": device["equipmentName"],
+            "manufacturer": "Epever",
+            "model": device.get("productName", "Solar Inverter"),
+            "sw_version": device.get("version"),
+        }
+
+    @property
+    def native_value(self) -> str:
+        """Return the value of the sensor."""
+        # Update value from coordinator if device status changed
+        device_id = self._device["id"]
+        devices_data = self.coordinator.data.get("devices", {})
+        
+        for station_id, devices in devices_data.items():
+            for device in devices.get("data", {}).get("list", []):
+                if device["id"] == device_id:
+                    # Update dynamic values
+                    if self._sensor_id == "_device_status_text":
+                        return "Online" if device.get("status") == 1 else "Offline"
+                    # For static values, return stored value
+                    break
+        
+        return self._value
