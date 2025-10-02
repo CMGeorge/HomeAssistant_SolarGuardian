@@ -1,6 +1,6 @@
 # ✅ GitHub Workflow Validation Complete
 
-**Date**: October 2, 2025  
+**Date**: October 2, 2025
 **Status**: All workflows validated and passing locally
 
 ---
@@ -202,19 +202,19 @@ Runs:
 
 ## 📊 Validation Results Summary
 
-| Workflow             | Status | Notes                                    |
-| -------------------- | ------ | ---------------------------------------- |
-| Hassfest             | ✅     | All checks passed                        |
-| JSON Validation      | ✅     | All files valid                          |
-| Python Quality       | ✅     | Black, isort, Ruff all passed            |
-| Manifest             | ✅     | All requirements met                     |
-| HACS Validation      | ✅     | All requirements met                     |
-| Pre-commit           | ✅     | All hooks passed                         |
-| Unit Tests           | ⚠️     | Expected failures (missing dependencies) |
-| Integration Tests    | ⏭️     | Require API credentials                  |
-| CodeQL               | ⏭️     | GitHub-only                              |
-| Release              | ⏭️     | Triggered on tags                        |
-| Stale/Labels         | ⏭️     | Scheduled/GitHub-only                    |
+| Workflow          | Status | Notes                                    |
+| ----------------- | ------ | ---------------------------------------- |
+| Hassfest          | ✅     | All checks passed                        |
+| JSON Validation   | ✅     | All files valid                          |
+| Python Quality    | ✅     | Black, isort, Ruff all passed            |
+| Manifest          | ✅     | All requirements met                     |
+| HACS Validation   | ✅     | All requirements met                     |
+| Pre-commit        | ✅     | All hooks passed                         |
+| Unit Tests        | ⚠️     | Expected failures (missing dependencies) |
+| Integration Tests | ⏭️     | Require API credentials                  |
+| CodeQL            | ⏭️     | GitHub-only                              |
+| Release           | ⏭️     | Triggered on tags                        |
+| Stale/Labels      | ⏭️     | Scheduled/GitHub-only                    |
 
 ---
 
@@ -332,6 +332,6 @@ The integration:
 
 ---
 
-**Generated**: October 2, 2025  
-**Integration Version**: 1.0.0  
+**Generated**: October 2, 2025
+**Integration Version**: 1.0.0
 **Home Assistant**: 2025.9.0+

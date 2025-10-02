@@ -47,15 +47,41 @@ A comprehensive Home Assistant integration for Epever Solar inverters using the 
 
 ## Configuration
 
-1. Obtain API credentials from your SolarGuardian web portal:
-   - Login to your SolarGuardian account
-   - Go to System Management > Personal Information Management > Open API
-   - Apply for API credentials (appKey and appSecret)
+### Step 1: Obtain API Credentials
 
-2. Configure the integration:
-   - Domain: Use `openapi.epsolarpv.com` for Mainland China or `glapi.mysolarguardian.com` for International
-   - Enter your appKey and appSecret
-   - Select update interval (default: 30 seconds)
+You need to obtain your `App Key` and `App Secret` from Epever:
+
+**📖 [Complete Guide: How to Get API Credentials](docs/API_CREDENTIALS.md)**
+
+**Quick Summary**:
+
+1. **Recommended**: Email Epever support (`support@epever.com`) requesting API credentials
+2. **Alternative**: Extract from mobile app using network monitoring (advanced)
+3. Provide your SolarGuardian account details to verify ownership
+
+See the [detailed guide](docs/API_CREDENTIALS.md) for step-by-step instructions including:
+
+- Email templates for requesting credentials
+- Network traffic capture methods
+- Troubleshooting tips
+- Security best practices
+
+### Step 2: Configure Integration
+
+1. Configure the integration in Home Assistant:
+   - Go to **Settings > Devices & Services**
+   - Click "**Add Integration**"
+   - Search for "**SolarGuardian**"
+
+2. Enter your credentials:
+   - **Domain**:
+     - `China` (openapi.epsolarpv.com) - for accounts registered in China
+     - `International` (glapi.mysolarguardian.com) - for international accounts
+   - **App Key**: Your API key from Epever
+   - **App Secret**: Your API secret from Epever
+   - **Update Interval**: 15-300 seconds (default: 15 seconds)
+
+3. Click **Submit** - the integration will test the connection
 
 ---
 

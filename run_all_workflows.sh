@@ -257,7 +257,7 @@ if [ -f ".pre-commit-config.yaml" ]; then
         echo "  Installing pre-commit..."
         pip install pre-commit > /dev/null 2>&1
     fi
-    
+
     echo "  Running pre-commit hooks..."
     if pre-commit run --all-files 2>&1 | tail -20; then
         echo -e "  ${GREEN}✅ PASSED${NC}"
