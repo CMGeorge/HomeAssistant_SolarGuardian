@@ -36,12 +36,14 @@
 ### Method 2: Manual Installation
 
 1. **Download Files**
+
    ```bash
    cd /config
    git clone https://github.com/CMGeorge/HomeAssistant_SolarGuardina.git
    ```
 
 2. **Copy Integration**
+
    ```bash
    cp -r HomeAssistant_SolarGuardina/custom_components/solarguardian /config/custom_components/
    ```
@@ -73,6 +75,7 @@
 ### Advanced Configuration
 
 The integration automatically discovers all available:
+
 - Power stations
 - Gateways
 - Devices (solar inverters, charge controllers, etc.)
@@ -94,6 +97,7 @@ The integration automatically discovers all available:
 ### Integration with Energy Dashboard
 
 1. **Add Solar Source**
+
    ```yaml
    energy:
      sources:
@@ -132,6 +136,7 @@ The integration automatically discovers all available:
 ### Log Analysis
 
 Enable debug logging:
+
 ```yaml
 logger:
   default: info
@@ -142,6 +147,7 @@ logger:
 ### API Rate Limits
 
 The integration automatically handles rate limiting:
+
 - Authentication: 10 calls per minute
 - Data requests: 30 calls per minute
 - Default update interval: 30 seconds (configurable)
@@ -149,6 +155,7 @@ The integration automatically handles rate limiting:
 ## Performance Optimization
 
 ### Reduce Update Frequency
+
 If you have many devices or want to reduce API calls:
 
 1. Go to Settings → Devices & Services → SolarGuardian
@@ -156,6 +163,7 @@ If you have many devices or want to reduce API calls:
 3. Increase update interval (e.g., 60 seconds)
 
 ### Selective Monitoring
+
 The integration creates sensors for all available parameters. You can disable unused sensors:
 
 1. Go to Settings → Entities

@@ -4,20 +4,22 @@
 
 ### ✅ 1. Moved All Documentation to `docs/` Folder
 
-**Before**: 30+ .md files cluttering root directory  
+**Before**: 30+ .md files cluttering root directory
 **After**: Clean root, all docs in `docs/` folder
 
 **Moved files (30 total)**:
-- Bug fix documentation (BUGFIX_*.md)
-- Session summaries (SESSION_*.md)
-- Test results (TEST_RESULTS_*.md)
-- Setup guides (HACS_*.md)
+
+- Bug fix documentation (BUGFIX\_\*.md)
+- Session summaries (SESSION\_\*.md)
+- Test results (TEST*RESULTS*\*.md)
+- Setup guides (HACS\_\*.md)
 - Fix summaries (FIXES_SUMMARY.md, etc.)
-- Analysis documents (RATE_LIMIT_*.md, SENSOR_*.md)
+- Analysis documents (RATE*LIMIT*\_.md, SENSOR\_\_.md)
 - Control platform guide
 - Quick references
 
 **Root now only has essential files**:
+
 - README.md ← User-facing documentation
 - CHANGELOG.md ← Version history
 - CONTRIBUTING.md ← Contribution guidelines
@@ -29,9 +31,11 @@
 ### ✅ 2. Cleaned Up Unnecessary Test Files
 
 **Removed from root**:
+
 - `test_sensor_value_fix.py` ← Ad-hoc debugging file
 
 **Removed from tests/ directory (20 files)**:
+
 - Duplicate files:
   - `tests/INSTALLATION.md`
   - `tests/LICENSE`
@@ -61,6 +65,7 @@
 ### ✅ 3. Tests Directory - Now Clean
 
 **What remains** (proper structure):
+
 ```
 tests/
 ├── .env.example          # Credentials template for testing
@@ -80,6 +85,7 @@ tests/
 ```
 
 **These tests are used by**:
+
 - ✅ `pytest` command
 - ✅ GitHub Actions workflows (`.github/workflows/test.yaml`)
 - ✅ CI/CD pipeline
@@ -87,6 +93,7 @@ tests/
 ## Repository Structure - Before vs After
 
 ### Before 🔴
+
 ```
 HomeAssistant_SolarGuardian/
 ├── README.md
@@ -141,6 +148,7 @@ HomeAssistant_SolarGuardian/
 ```
 
 ### After 🟢
+
 ```
 HomeAssistant_SolarGuardian/
 ├── README.md                    ✅ Essential
@@ -170,18 +178,21 @@ HomeAssistant_SolarGuardian/
 ## Benefits
 
 ### 🎯 Clean Root Directory
+
 - Easy to navigate
 - Professional appearance
 - Users see essential files first
 - GitHub readme looks clean
 
 ### 🎯 Organized Documentation
+
 - All docs in one place (`docs/`)
 - Easy to find reference materials
 - Development history preserved
 - Doesn't clutter main view
 
 ### 🎯 Clean Tests Directory
+
 - Only proper tests remain
 - No confusion with old scripts
 - Works perfectly with pytest
@@ -190,15 +201,18 @@ HomeAssistant_SolarGuardian/
 ## Files Removed vs Kept
 
 ### Removed: 52 files total
+
 - 30 documentation files → Moved to `docs/`
 - 1 root test file → Deleted
 - 21 test directory files → Deleted
 
 ### Kept in Root: 12 essential files
+
 - 7 user-facing docs (README, CHANGELOG, etc.)
 - 5 config files (hacs.json, pyproject.toml, etc.)
 
 ### Kept in tests/: Proper structure only
+
 - Unit tests (`tests/unit/`)
 - Integration tests (`tests/integration/`)
 - Test configuration (`.env.example`)
@@ -206,6 +220,7 @@ HomeAssistant_SolarGuardian/
 ## Git Operations
 
 **Commit**: `7803924`
+
 ```
 chore: Clean up repository structure
 
@@ -221,6 +236,7 @@ Result: Clean, professional repository structure
 ```
 
 **Statistics**:
+
 - 52 files changed
 - 30 files moved to `docs/`
 - 22 files deleted
@@ -229,12 +245,14 @@ Result: Clean, professional repository structure
 ## Testing Impact
 
 **✅ No impact on working tests**:
+
 - `tests/unit/` - Still works perfectly
 - `tests/integration/` - Still works perfectly
 - `pytest` command - Works
 - GitHub Actions - Works
 
 **What was removed**:
+
 - Ad-hoc scripts used for debugging only
 - Old test runners (replaced by pytest)
 - Duplicate files that served no purpose
@@ -250,6 +268,6 @@ Result: Clean, professional repository structure
 
 ---
 
-**Cleanup Date**: October 2, 2025  
-**Commit**: 7803924  
+**Cleanup Date**: October 2, 2025
+**Commit**: 7803924
 **Status**: Complete ✅

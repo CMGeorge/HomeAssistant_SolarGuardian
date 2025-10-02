@@ -1,45 +1,47 @@
 """Unit tests for SolarGuardian constants."""
-import unittest
+
+import os
 import re
 
 # Add custom components to path
 import sys
-import os
+import unittest
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(current_dir, '../../custom_components'))
+sys.path.insert(0, os.path.join(current_dir, "../../custom_components"))
 
 from solarguardian.const import (
-    DOMAIN,
     CONF_APP_KEY,
     CONF_APP_SECRET,
     CONF_DOMAIN,
-    CONF_UPDATE_INTERVAL,
     CONF_TEST_MODE,
-    DEFAULT_UPDATE_INTERVAL,
+    CONF_UPDATE_INTERVAL,
     DEFAULT_TIMEOUT,
-    DOMAIN_CHINA,
-    DOMAIN_INTERNATIONAL,
-    DEVICE_CLASS_POWER,
-    DEVICE_CLASS_VOLTAGE,
+    DEFAULT_UPDATE_INTERVAL,
+    DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
+    DEVICE_CLASS_POWER,
     DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_BATTERY,
-    UNIT_WATT,
-    UNIT_VOLT,
-    UNIT_AMPERE,
-    UNIT_KWH,
-    UNIT_CELSIUS,
-    UNIT_PERCENT,
+    DEVICE_CLASS_VOLTAGE,
+    DOMAIN,
+    DOMAIN_CHINA,
+    DOMAIN_INTERNATIONAL,
     ENDPOINT_AUTH,
-    ENDPOINT_POWER_STATIONS,
-    ENDPOINT_DEVICES,
-    ENDPOINT_DEVICE_PARAMETERS,
     ENDPOINT_DEVICE_HISTORY,
+    ENDPOINT_DEVICE_PARAMETERS,
+    ENDPOINT_DEVICES,
     ENDPOINT_LATEST_DATA,
+    ENDPOINT_POWER_STATIONS,
     LATEST_DATA_PORT,
     RATE_LIMIT_AUTH,
-    RATE_LIMIT_DATA
+    RATE_LIMIT_DATA,
+    UNIT_AMPERE,
+    UNIT_CELSIUS,
+    UNIT_KWH,
+    UNIT_PERCENT,
+    UNIT_VOLT,
+    UNIT_WATT,
 )
 
 
@@ -51,7 +53,7 @@ class TestDomainConstants(unittest.TestCase):
         self.assertEqual(DOMAIN, "solarguardian")
         self.assertIsInstance(DOMAIN, str)
         self.assertGreater(len(DOMAIN), 0)
-        
+
         # Domain should be lowercase and contain no spaces
         self.assertEqual(DOMAIN, DOMAIN.lower())
         self.assertNotIn(" ", DOMAIN)
@@ -59,18 +61,18 @@ class TestDomainConstants(unittest.TestCase):
     def test_api_domains(self):
         """Test API domain constants."""
         domains = [DOMAIN_CHINA, DOMAIN_INTERNATIONAL]
-        
+
         for domain in domains:
             self.assertIsInstance(domain, str)
             self.assertGreater(len(domain), 0)
-            
+
             # Should look like a valid hostname
             self.assertIn(".", domain)
             self.assertNotIn(" ", domain)
             self.assertNotIn("http", domain)  # Should not include protocol
-            
+
             # Should be valid domain format
-            domain_pattern = r'^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$'
+            domain_pattern = r"^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
             self.assertIsNotNone(re.match(domain_pattern, domain))
 
     def test_domain_differences(self):
@@ -88,14 +90,14 @@ class TestConfigurationConstants(unittest.TestCase):
             CONF_APP_SECRET,
             CONF_DOMAIN,
             CONF_UPDATE_INTERVAL,
-            CONF_TEST_MODE
+            CONF_TEST_MODE,
         ]
-        
+
         for key in config_keys:
             self.assertIsInstance(key, str)
             self.assertGreater(len(key), 0)
             self.assertNotIn(" ", key)  # Should use underscores, not spaces
-        
+
         # Check specific expected values
         self.assertEqual(CONF_APP_KEY, "app_key")
         self.assertEqual(CONF_APP_SECRET, "app_secret")
@@ -109,9 +111,9 @@ class TestConfigurationConstants(unittest.TestCase):
             CONF_APP_SECRET,
             CONF_DOMAIN,
             CONF_UPDATE_INTERVAL,
-            CONF_TEST_MODE
+            CONF_TEST_MODE,
         ]
-        
+
         self.assertEqual(len(config_keys), len(set(config_keys)))
 
 
@@ -149,14 +151,14 @@ class TestDeviceClassConstants(unittest.TestCase):
             DEVICE_CLASS_CURRENT,
             DEVICE_CLASS_ENERGY,
             DEVICE_CLASS_TEMPERATURE,
-            DEVICE_CLASS_BATTERY
+            DEVICE_CLASS_BATTERY,
         ]
-        
+
         for device_class in device_classes:
             self.assertIsInstance(device_class, str)
             self.assertGreater(len(device_class), 0)
             self.assertNotIn(" ", device_class)
-        
+
         # Check specific expected values
         self.assertEqual(DEVICE_CLASS_POWER, "power")
         self.assertEqual(DEVICE_CLASS_VOLTAGE, "voltage")
@@ -170,9 +172,9 @@ class TestDeviceClassConstants(unittest.TestCase):
             DEVICE_CLASS_CURRENT,
             DEVICE_CLASS_ENERGY,
             DEVICE_CLASS_TEMPERATURE,
-            DEVICE_CLASS_BATTERY
+            DEVICE_CLASS_BATTERY,
         ]
-        
+
         self.assertEqual(len(device_classes), len(set(device_classes)))
 
 
@@ -187,13 +189,13 @@ class TestUnitConstants(unittest.TestCase):
             UNIT_AMPERE,
             UNIT_KWH,
             UNIT_CELSIUS,
-            UNIT_PERCENT
+            UNIT_PERCENT,
         ]
-        
+
         for unit in units:
             self.assertIsInstance(unit, str)
             self.assertGreater(len(unit), 0)
-        
+
         # Check specific expected values
         self.assertEqual(UNIT_WATT, "W")
         self.assertEqual(UNIT_VOLT, "V")
@@ -206,10 +208,10 @@ class TestUnitConstants(unittest.TestCase):
         """Test unit format correctness."""
         # Temperature unit should have degree symbol
         self.assertIn("°", UNIT_CELSIUS)
-        
+
         # Percent should be single character
         self.assertEqual(len(UNIT_PERCENT), 1)
-        
+
         # Basic electrical units should be single letters
         basic_units = [UNIT_WATT, UNIT_VOLT, UNIT_AMPERE]
         for unit in basic_units:
@@ -228,16 +230,16 @@ class TestEndpointConstants(unittest.TestCase):
             ENDPOINT_DEVICES,
             ENDPOINT_DEVICE_PARAMETERS,
             ENDPOINT_DEVICE_HISTORY,
-            ENDPOINT_LATEST_DATA
+            ENDPOINT_LATEST_DATA,
         ]
-        
+
         for endpoint in endpoints:
             self.assertIsInstance(endpoint, str)
             self.assertGreater(len(endpoint), 0)
-            
+
             # Should start with forward slash
             self.assertTrue(endpoint.startswith("/"))
-            
+
             # Should not contain spaces
             self.assertNotIn(" ", endpoint)
 
@@ -249,9 +251,9 @@ class TestEndpointConstants(unittest.TestCase):
             ENDPOINT_POWER_STATIONS,
             ENDPOINT_DEVICES,
             ENDPOINT_DEVICE_PARAMETERS,
-            ENDPOINT_DEVICE_HISTORY
+            ENDPOINT_DEVICE_HISTORY,
         ]
-        
+
         for endpoint in epcloud_endpoints:
             self.assertIn("/epCloud/", endpoint)
 
@@ -268,7 +270,7 @@ class TestRateLimitingConstants(unittest.TestCase):
     def test_rate_limits(self):
         """Test rate limiting constants."""
         rate_limits = [RATE_LIMIT_AUTH, RATE_LIMIT_DATA]
-        
+
         for rate_limit in rate_limits:
             self.assertIsInstance(rate_limit, int)
             self.assertGreater(rate_limit, 0)
@@ -302,9 +304,9 @@ class TestConstantTypeConsistency(unittest.TestCase):
             UNIT_VOLT,
             UNIT_AMPERE,
             ENDPOINT_AUTH,
-            ENDPOINT_POWER_STATIONS
+            ENDPOINT_POWER_STATIONS,
         ]
-        
+
         for constant in string_constants:
             self.assertIsInstance(constant, str)
 
@@ -315,9 +317,9 @@ class TestConstantTypeConsistency(unittest.TestCase):
             DEFAULT_TIMEOUT,
             LATEST_DATA_PORT,
             RATE_LIMIT_AUTH,
-            RATE_LIMIT_DATA
+            RATE_LIMIT_DATA,
         ]
-        
+
         for constant in integer_constants:
             self.assertIsInstance(constant, int)
 
@@ -331,12 +333,12 @@ class TestConstantTypeConsistency(unittest.TestCase):
             DEVICE_CLASS_POWER,
             UNIT_WATT,
             ENDPOINT_AUTH,
-            RATE_LIMIT_AUTH
+            RATE_LIMIT_AUTH,
         ]
-        
+
         for constant in all_constants:
             self.assertIsNotNone(constant)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

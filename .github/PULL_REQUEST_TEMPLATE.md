@@ -1,11 +1,14 @@
 ## Description
+
 <!-- Describe your changes in detail -->
 
 ## Motivation and Context
+
 <!-- Why is this change required? What problem does it solve? -->
 <!-- If it fixes an open issue, please link to the issue here. -->
 
 ## Type of change
+
 <!-- Please delete options that are not relevant. -->
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
@@ -15,6 +18,7 @@
 - [ ] Code quality improvement
 
 ## Testing
+
 <!-- Please describe the tests that you ran to verify your changes. -->
 <!-- Provide instructions so we can reproduce. -->
 
@@ -24,6 +28,7 @@
 - [ ] Manual testing completed
 
 ## Checklist:
+
 <!-- Go over all the following points, and put an `x` in all the boxes that apply. -->
 
 - [ ] My code follows the style guidelines of this project

@@ -1,12 +1,13 @@
 # CRITICAL BUG FIX: Sensors Showing "Unknown"
 
-**Date**: October 1, 2025  
-**Severity**: CRITICAL - All sensors show "Unknown" despite API returning 43 values  
+**Date**: October 1, 2025
+**Severity**: CRITICAL - All sensors show "Unknown" despite API returning 43 values
 **Status**: ✅ FIXED
 
 ## Problem
 
 All sensors in Home Assistant showed "Unknown" values, despite logs showing:
+
 ```
 Retrieved 43 latest values for device Makkaizsolt_1742059709718
 ```
@@ -18,6 +19,7 @@ Retrieved 43 latest values for device Makkaizsolt_1742059709718
 The sensor code was matching on `dataIdentifier`, but the latest_data API endpoint returns `dataPointId`.
 
 ### Device Parameters Response (getEquipment)
+
 ```json
 {
   "dataIdentifier": "AC_3",        ← String identifier (e.g., "OutputPower")
@@ -28,6 +30,7 @@ The sensor code was matching on `dataIdentifier`, but the latest_data API endpoi
 ```
 
 ### Latest Data Response (lastDatapoint)
+
 ```json
 {
   "dataPointId": 105646605,        ← ONLY has dataPointId (NOT dataIdentifier!)
@@ -69,6 +72,7 @@ python run_real_api_tests.py
 ```
 
 **Results**:
+
 - API returns `dataPointId` in latest_data response ✅
 - Device parameters contain both `dataPointId` and `dataIdentifier` ✅
 - Matching on `dataPointId` correctly retrieves values ✅
@@ -76,11 +80,13 @@ python run_real_api_tests.py
 ## Impact
 
 **Before Fix**:
+
 - ❌ All 79 sensors showed "Unknown"
 - ❌ 43 real-time values retrieved but not displayed
 - ❌ Only 6 device info text sensors worked
 
 **After Fix**:
+
 - ✅ 43 sensors show real-time values
 - ✅ 36 static/configuration sensors show "Unknown" (expected - no real-time data)
 - ✅ 6 device info sensors work correctly
@@ -95,11 +101,13 @@ python run_real_api_tests.py
 ## Deployment
 
 1. **Update Integration**:
+
    ```
    HACS → Integrations → SolarGuardian → Redownload
    ```
 
 2. **Restart Home Assistant**:
+
    ```
    Settings → System → Restart Home Assistant
    ```
@@ -112,6 +120,7 @@ python run_real_api_tests.py
 ## API Documentation Reference
 
 See `/solarguardian_api.txt`:
+
 - Section 3.3 (Response parameters) - No `dataIdentifier` field listed
 - Section 3.5 (Response example) - Shows `dataPointId` but no `dataIdentifier`
 - Section 1.3.3 (Device parameters) - Shows both `dataPointId` and `dataIdentifier`
@@ -119,6 +128,7 @@ See `/solarguardian_api.txt`:
 ## Prevention
 
 Future API integrations should:
+
 1. ✅ Test with real API calls, not just mocks
 2. ✅ Verify field names in API documentation
 3. ✅ Use the existing `run_real_api_tests.py` before committing
@@ -126,6 +136,6 @@ Future API integrations should:
 
 ---
 
-**Commit**: `fix: Match sensors on dataPointId instead of dataIdentifier for latest_data`  
-**Issue**: #CRITICAL - All sensors showing "Unknown"  
+**Commit**: `fix: Match sensors on dataPointId instead of dataIdentifier for latest_data`
+**Issue**: #CRITICAL - All sensors showing "Unknown"
 **Tested**: Real API test confirmed fix works correctly

@@ -10,7 +10,9 @@ CONF_UPDATE_INTERVAL = "update_interval"
 CONF_TEST_MODE = "test_mode"
 
 # Default values
-DEFAULT_UPDATE_INTERVAL = 15  # seconds - safe for most installations, respects 30 calls/minute API limit
+DEFAULT_UPDATE_INTERVAL = (
+    15  # seconds - safe for most installations, respects 30 calls/minute API limit
+)
 DEFAULT_TIMEOUT = 30  # seconds
 
 # API domains
@@ -53,14 +55,14 @@ MOCK_POWER_STATION = {
     "id": 999999,
     "powerStationName": "Test Solar Station",
     "capacity": 5000,
-    "location": "Test Location"
+    "location": "Test Location",
 }
 
 MOCK_DEVICE = {
     "id": 888888,
     "equipmentName": "Test Solar Inverter",
     "productName": "Mock Inverter Model",
-    "version": "1.0.0"
+    "version": "1.0.0",
 }
 
 MOCK_VARIABLE_GROUPS = [
@@ -75,7 +77,7 @@ MOCK_VARIABLE_GROUPS = [
                 "unit": "W",
                 "decimal": "0",
                 "dataPointId": 101754260,
-                "deviceNo": "2023021512345678900001"
+                "deviceNo": "2023021512345678900001",
             },
             {
                 "dataIdentifier": "InputPower",
@@ -84,7 +86,7 @@ MOCK_VARIABLE_GROUPS = [
                 "unit": "W",
                 "decimal": "0",
                 "dataPointId": 101754261,
-                "deviceNo": "2023021512345678900001"
+                "deviceNo": "2023021512345678900001",
             },
             {
                 "dataIdentifier": "loadpower",
@@ -93,9 +95,9 @@ MOCK_VARIABLE_GROUPS = [
                 "unit": "W",
                 "decimal": "0",
                 "dataPointId": 101754262,
-                "deviceNo": "2023021512345678900001"
-            }
-        ]
+                "deviceNo": "2023021512345678900001",
+            },
+        ],
     },
     {
         "variableGroupNameE": "Voltage Parameters",
@@ -108,7 +110,7 @@ MOCK_VARIABLE_GROUPS = [
                 "unit": "V",
                 "decimal": "1",
                 "dataPointId": 101754263,
-                "deviceNo": "2023021512345678900001"
+                "deviceNo": "2023021512345678900001",
             },
             {
                 "dataIdentifier": "InputVoltage",
@@ -117,7 +119,7 @@ MOCK_VARIABLE_GROUPS = [
                 "unit": "V",
                 "decimal": "1",
                 "dataPointId": 101754264,
-                "deviceNo": "2023021512345678900001"
+                "deviceNo": "2023021512345678900001",
             },
             {
                 "dataIdentifier": "BatteryVoltage",
@@ -126,9 +128,9 @@ MOCK_VARIABLE_GROUPS = [
                 "unit": "V",
                 "decimal": "2",
                 "dataPointId": 101754265,
-                "deviceNo": "2023021512345678900001"
-            }
-        ]
+                "deviceNo": "2023021512345678900001",
+            },
+        ],
     },
     {
         "variableGroupNameE": "Current Parameters",
@@ -141,7 +143,7 @@ MOCK_VARIABLE_GROUPS = [
                 "unit": "A",
                 "decimal": "2",
                 "dataPointId": 101754266,
-                "deviceNo": "2023021512345678900001"
+                "deviceNo": "2023021512345678900001",
             },
             {
                 "dataIdentifier": "InputCurrent",
@@ -150,8 +152,8 @@ MOCK_VARIABLE_GROUPS = [
                 "unit": "A",
                 "decimal": "2",
                 "dataPointId": 101754267,
-                "deviceNo": "2023021512345678900001"
-            }
-        ]
-    }
+                "deviceNo": "2023021512345678900001",
+            },
+        ],
+    },
 ]

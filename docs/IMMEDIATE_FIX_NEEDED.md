@@ -33,28 +33,31 @@ Home Assistant is running **OLD CODE**. The fix (commit `73bef59`) is on GitHub 
 After restart, check logs (Settings → System → Logs):
 
 **GOOD** ✅:
+
 ```
 Setting up sensors with data status: success
 Update complete: 1 stations, 1 devices, 79 sensors, 0 errors
 ```
 
 **BAD** ❌:
+
 ```
 AttributeError: 'SolarGuardianSensor' object has no attribute '_last_valid_value'
 ```
 
 ## 📝 Commits You Need
 
-| Commit | What It Does | Have It? |
-|--------|--------------|----------|
+| Commit    | What It Does             | Have It?             |
+| --------- | ------------------------ | -------------------- |
 | `73bef59` | **Fixes AttributeError** | ❌ **YOU NEED THIS** |
-| `6b8d987` | Documentation | Optional |
+| `6b8d987` | Documentation            | Optional             |
 
 ## Still Broken?
 
 If HACS won't update, use **Option B** (nuclear option) above.
 
 This will:
+
 - ✅ Get latest code
 - ✅ Recreate all sensors properly
 - ✅ Fix the error

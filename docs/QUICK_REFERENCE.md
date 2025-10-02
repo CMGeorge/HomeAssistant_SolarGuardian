@@ -5,6 +5,7 @@ Quick reference for common tasks in the SolarGuardian integration project.
 ## Setup Commands
 
 ### Install Dependencies
+
 ```bash
 # Using pip3
 pip3 install pytest pytest-asyncio python-dotenv aiohttp
@@ -17,6 +18,7 @@ pip install pytest pytest-asyncio python-dotenv
 ```
 
 ### Configure Test Credentials
+
 ```bash
 cd tests
 cp .env.example .env
@@ -27,12 +29,14 @@ nano .env  # or use your preferred editor
 ## Test Commands
 
 ### Run All Tests
+
 ```bash
 cd tests
 python3 -m pytest -v
 ```
 
 ### Run Specific Test Categories
+
 ```bash
 # Unit tests only
 python3 -m pytest unit/ -v
@@ -45,6 +49,7 @@ python3 -m pytest --cov=custom_components.solarguardian --cov-report=html
 ```
 
 ### Run Specific Tests
+
 ```bash
 # Specific test file
 python3 -m pytest unit/test_api.py -v
@@ -59,6 +64,7 @@ python3 -m pytest unit/test_api.py::TestSolarGuardianAPI::test_authenticate -v
 ## Git Commands
 
 ### Review Changes
+
 ```bash
 # See all changes
 git status
@@ -71,6 +77,7 @@ git status | grep .env
 ```
 
 ### Commit Changes
+
 ```bash
 # Add new files
 git add .github/ .gitignore tests/.env.example tests/.gitignore
@@ -84,6 +91,7 @@ git push origin master
 ```
 
 ### Security Check Before Push
+
 ```bash
 # Verify .env is NOT tracked
 git ls-files | grep -E "\.env$"
@@ -96,6 +104,7 @@ git diff --cached --name-only
 ## Development Commands
 
 ### Run Integration in Home Assistant
+
 ```bash
 # Copy to HA config directory
 cp -r custom_components/solarguardian ~/.homeassistant/custom_components/
@@ -105,7 +114,9 @@ cp -r custom_components/solarguardian ~/.homeassistant/custom_components/
 ```
 
 ### Enable Debug Logging in Home Assistant
+
 Add to `configuration.yaml`:
+
 ```yaml
 logger:
   default: info
@@ -114,6 +125,7 @@ logger:
 ```
 
 ### View Home Assistant Logs
+
 ```bash
 # From HA config directory
 tail -f home-assistant.log | grep solarguardian
@@ -122,6 +134,7 @@ tail -f home-assistant.log | grep solarguardian
 ## API Testing Commands
 
 ### Test API Connection Manually
+
 ```bash
 # Test domain connectivity
 curl -I https://glapi.mysolarguardian.com
@@ -134,6 +147,7 @@ curl -X POST https://glapi.mysolarguardian.com/epCloud/user/getAuthToken \
 ```
 
 ### Run Integration Services
+
 From Home Assistant Developer Tools > Services:
 
 ```yaml
@@ -152,6 +166,7 @@ service: solarguardian.reset_latest_data
 ## File Management Commands
 
 ### View Project Structure
+
 ```bash
 # Tree view (if available)
 tree -L 3 -I '__pycache__|*.pyc'
@@ -161,6 +176,7 @@ find . -type f -not -path '*/\.*' -not -path '*/__pycache__/*' | sort
 ```
 
 ### Check File Sizes
+
 ```bash
 # Find large files
 find . -type f -size +1M -exec ls -lh {} \;
@@ -170,6 +186,7 @@ du -sh custom_components/solarguardian/*
 ```
 
 ### Clean Up Python Cache
+
 ```bash
 # Remove all __pycache__ directories
 find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null
@@ -181,6 +198,7 @@ find . -name "*.pyc" -delete
 ## Troubleshooting Commands
 
 ### Check Python Environment
+
 ```bash
 # Python version
 python3 --version
@@ -193,6 +211,7 @@ python3 -c "import sys; print('\n'.join(sys.path))"
 ```
 
 ### Test Import Paths
+
 ```bash
 # Test if integration can be imported
 cd tests
@@ -200,6 +219,7 @@ python3 -c "import sys; sys.path.insert(0, '../custom_components'); from solargu
 ```
 
 ### View Logs for Errors
+
 ```bash
 # From tests directory
 python3 -m pytest -v --tb=short
@@ -214,6 +234,7 @@ python3 -m pytest -x
 ## Documentation Commands
 
 ### Generate Documentation
+
 ```bash
 # If you add documentation generation later
 # pip install sphinx sphinx-rtd-theme
@@ -222,6 +243,7 @@ python3 -m pytest -x
 ```
 
 ### View API Documentation
+
 ```bash
 # Open in browser
 open solarguardian_api.txt
@@ -244,6 +266,7 @@ alias sg-log='tail -f ~/.homeassistant/home-assistant.log | grep solarguardian'
 ## Quick Checks
 
 ### Before Committing
+
 ```bash
 # Run all these checks
 git status | grep "\.env$"  # Should see nothing
@@ -253,6 +276,7 @@ grep -r "appSecret.*=.*['\"]" custom_components/  # Should find nothing
 ```
 
 ### Security Audit
+
 ```bash
 # Check for any hardcoded credentials
 grep -r "appKey\|appSecret\|X-Access-Token" custom_components/ --exclude-dir=__pycache__
@@ -264,6 +288,7 @@ git log -S "appKey" --all
 ## Environment Variables
 
 ### Set for Testing
+
 ```bash
 # Temporary for current session
 export APP_KEY="your_key"
@@ -276,6 +301,7 @@ export DOMAIN="glapi.mysolarguardian.com"
 ## Performance Commands
 
 ### Profile Tests
+
 ```bash
 # Time test execution
 time python3 -m pytest tests/ -v

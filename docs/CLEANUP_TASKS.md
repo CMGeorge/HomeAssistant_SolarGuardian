@@ -7,6 +7,7 @@ This document outlines files that should be moved or cleaned up to properly orga
 The following test files are duplicated in the root directory and should be removed (they already exist in `/tests/`):
 
 ### Test Execution Scripts
+
 - [x] `/run_basic_tests.py` → Already in `/tests/run_basic_tests.py` - ✅ DELETED from root
 - [x] `/run_minimal_tests.py` → Already in `/tests/run_minimal_tests.py` - ✅ DELETED from root
 - [x] `/run_real_api_tests.py` → Already in `/tests/run_real_api_tests.py` - ✅ DELETED from root
@@ -14,6 +15,7 @@ The following test files are duplicated in the root directory and should be remo
 - [x] `/run_tests.py` → Already in `/tests/run_tests.py` - ✅ DELETED from root
 
 ### Test Files
+
 - [x] `/test_integration.py` → Already in `/tests/test_integration.py` - ✅ DELETED from root
 
 ## Commands to Clean Up
@@ -36,6 +38,7 @@ ls -la tests/
 ## New Files Created
 
 ### Configuration Files
+
 - [x] `/.github/copilot-instructions.md` - Comprehensive development guidelines
 - [x] `/.gitignore` - Git ignore rules (including .env protection)
 - [x] `/tests/.env.example` - Template for API credentials
@@ -45,6 +48,7 @@ ls -la tests/
 ## Files That Should Exist in /tests
 
 ### Required Files (ensure these exist)
+
 - [x] `/tests/.env.example` - Template for credentials ✅ CREATED
 - [x] `/tests/.env` - Your actual credentials (git-ignored) ✅ CREATED
 - [x] `/tests/.gitignore` - Ignore patterns for test directory ✅ CREATED
@@ -52,6 +56,7 @@ ls -la tests/
 - [x] `/tests/README.md` - Test documentation ✅ UPDATED
 
 ### Test Files
+
 - [x] `/tests/unit/test_api.py` - API client tests
 - [x] `/tests/unit/test_config_flow.py` - Config flow tests
 - [x] `/tests/unit/test_sensor.py` - Sensor tests
@@ -61,6 +66,7 @@ ls -la tests/
 ## Next Steps
 
 1. **Create your test credentials file:**
+
    ```bash
    cd tests
    cp .env.example .env
@@ -68,6 +74,7 @@ ls -la tests/
    ```
 
 2. **Remove duplicate test files from root:**
+
    ```bash
    # From repository root
    git rm test_integration.py
@@ -75,6 +82,7 @@ ls -la tests/
    ```
 
 3. **Verify test structure:**
+
    ```bash
    cd tests
    pytest --collect-only
@@ -91,21 +99,25 @@ ls -la tests/
 These files should remain in the root directory:
 
 ### Documentation
+
 - `/README.md` - Main project README
 - `/INSTALLATION.md` - Installation instructions
 - `/TROUBLESHOOTING.md` - Troubleshooting guide
 - `/LICENSE` - License file
 
 ### Configuration
+
 - `/example_config.yaml` - Example configuration
 - `/hacs.json` - HACS integration configuration
 - `/pytest.ini` - Pytest configuration (root level)
 
 ### API Documentation
+
 - `/SolarGuardian API V2.3.pdf` - Original API documentation
 - `/solarguardian_api.txt` - Text version of API documentation
 
 ### Integration Code
+
 - `/custom_components/solarguardian/` - The actual integration code
 
 ## Verification Checklist
@@ -132,6 +144,7 @@ After cleanup, verify:
 - [ ] `.env.example` contains only placeholder values
 
 Run this to verify no secrets are tracked:
+
 ```bash
 # Check what files are tracked
 git status
@@ -192,5 +205,5 @@ tests/
 
 ---
 
-**Date**: 2025-10-01  
+**Date**: 2025-10-01
 **Action Required**: Review and execute cleanup commands

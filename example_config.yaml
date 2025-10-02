@@ -58,7 +58,7 @@ template:
         device_class: energy
         state_class: total_increasing
         state: "{{ states('sensor.device060801_generated_energy_today') | float }}"
-        
+
       - name: "Total Solar Production"
         unit_of_measurement: "kWh"
         device_class: energy

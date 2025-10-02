@@ -1,17 +1,17 @@
 # BUG FIX: Incorrect Decimal Formatting on Sensor Values
 
-**Date**: October 1, 2025  
-**Severity**: HIGH - Sensor values incorrectly divided by 10^decimal  
+**Date**: October 1, 2025
+**Severity**: HIGH - Sensor values incorrectly divided by 10^decimal
 **Status**: ✅ FIXED
 
 ## Problem
 
 Sensors were showing incorrect values with wrong decimal places:
 
-| Sensor | Expected | Shown | Error |
-|--------|----------|-------|-------|
-| AC Output Voltage | 219.93 V | 2.1993 V | ÷ 100 |
-| AC Output Frequency | 50.00 Hz | 0.50 Hz | ÷ 100 |
+| Sensor              | Expected | Shown    | Error |
+| ------------------- | -------- | -------- | ----- |
+| AC Output Voltage   | 219.93 V | 2.1993 V | ÷ 100 |
+| AC Output Frequency | 50.00 Hz | 0.50 Hz  | ÷ 100 |
 
 ## Root Cause
 
@@ -20,6 +20,7 @@ Sensors were showing incorrect values with wrong decimal places:
 The code was applying decimal formatting to values that were **already formatted by the API**:
 
 ### API Response (latest_data endpoint)
+
 ```json
 {
   "dataPointId": 105646638,
@@ -29,6 +30,7 @@ The code was applying decimal formatting to values that were **already formatted
 ```
 
 ### Device Parameters
+
 ```json
 {
   "dataIdentifier": "load_4",
@@ -39,6 +41,7 @@ The code was applying decimal formatting to values that were **already formatted
 ```
 
 ### The Bug
+
 ```python
 # ❌ OLD CODE (BROKEN)
 value = float(data_point.get("value", 0))  # Gets 50.00
@@ -65,11 +68,13 @@ value = float(data_point.get("value", 0))  # Gets 50.00, returns 50.00 ✅
 ## API Behavior Analysis
 
 ### latest_data Endpoint (Port 7002)
+
 - ✅ Returns **formatted** values: `"50.00"`, `"220.06"`, `"48.2"`
 - ✅ Values are **strings** with decimals already applied
 - ❌ Do NOT apply decimal formatting
 
 ### getEquipment Endpoint (Device Parameters)
+
 - ✅ Returns **raw** integer values in `currentValue` field: `5000`, `22006`, `482`
 - ✅ Includes `decimal` field for formatting: `"2"`, `"2"`, `"1"`
 - ✅ DO apply decimal formatting: `5000 / 100 = 50.00`
@@ -84,6 +89,7 @@ python run_real_api_tests.py 2>&1 | grep -A 3 '"dataPointId": 105646638'
 ```
 
 **Result**:
+
 ```json
 {
   "dataPointId": 105646638,
@@ -95,12 +101,14 @@ python run_real_api_tests.py 2>&1 | grep -A 3 '"dataPointId": 105646638'
 ## Impact
 
 **Before Fix**:
+
 - ❌ AC Output Voltage: 2.1993 V (should be 219.93 V)
 - ❌ AC Output Frequency: 0.5 Hz (should be 50.0 Hz)
 - ❌ Battery Voltage: 4.82 V (should be 48.2 V)
 - ❌ All sensors with decimal > 0 were wrong
 
 **After Fix**:
+
 - ✅ AC Output Voltage: 219.93 V
 - ✅ AC Output Frequency: 50.0 Hz
 - ✅ Battery Voltage: 48.2 V
@@ -131,7 +139,7 @@ Same as previous fix:
 
 ---
 
-**Commit**: `fix: Remove double decimal formatting on latest_data sensor values`  
-**Issue**: Sensor values incorrectly divided by 10^decimal  
-**Tested**: Real API test shows values already formatted  
+**Commit**: `fix: Remove double decimal formatting on latest_data sensor values`
+**Issue**: Sensor values incorrectly divided by 10^decimal
+**Tested**: Real API test shows values already formatted
 **Related**: Part of sensor value fix series (after dataPointId matching fix)

@@ -5,10 +5,12 @@
 ## What Was Done
 
 ### ✅ Fixed Issues
+
 1. **manifest.json** - Fixed typo in URLs (`SolarGuardina` → `SolarGuardian`)
 2. **hacs.json** - Fixed `iot_class` case, added countries
 
 ### ✅ Added GitHub Workflows (7 workflows)
+
 1. **validate.yaml** - HACS + Hassfest + JSON + Python validation
 2. **test.yaml** - Unit tests + Integration tests
 3. **release.yaml** - Auto version bump on releases
@@ -18,6 +20,7 @@
 7. **labels.yaml** - Label synchronization
 
 ### ✅ Added Documentation
+
 - `CONTRIBUTING.md` - How to contribute
 - `SECURITY.md` - Security policy
 - `HACS_SETUP_COMPLETE.md` - Full setup docs
@@ -25,6 +28,7 @@
 - Code owners file
 
 ### ✅ Added Configuration
+
 - `.pre-commit-config.yaml` - Pre-commit hooks
 - `pyproject.toml` - Python tools config
 - `.gitattributes` - Git line endings
@@ -35,6 +39,7 @@
 ### For Users: Adding to HACS
 
 #### Option 1: Custom Repository (Available Now)
+
 ```
 1. Open Home Assistant
 2. Go to HACS
@@ -46,7 +51,9 @@
 ```
 
 #### Option 2: HACS Default (After Approval)
+
 Once added to HACS default repository:
+
 ```
 1. Open HACS in Home Assistant
 2. Search for "SolarGuardian"
@@ -56,20 +63,24 @@ Once added to HACS default repository:
 ### For You: Next Steps
 
 #### 1. Push Changes to GitHub
+
 ```bash
 cd /Users/cmgeorge/Dev/CMGeorge/HomeAssistant_SolarGuardian
 git push origin master
 ```
 
 #### 2. Watch Workflows Run
+
 After pushing, check: https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions
 
 Expected results:
+
 - ✅ Validate workflow should PASS
 - ⚠️ Test workflow might need pytest setup
 - ⚠️ Pre-commit might need code formatting
 
 #### 3. Fix Code Formatting (if needed)
+
 ```bash
 # Install tools
 pip install black isort ruff
@@ -86,6 +97,7 @@ git push
 ```
 
 #### 4. Create First Release
+
 ```bash
 # Create tag
 git tag -a v1.0.0 -m "Release v1.0.0 - HACS compatible"
@@ -96,7 +108,9 @@ git push origin v1.0.0
 ```
 
 #### 5. Submit to HACS Default (Optional)
+
 After testing with custom repository:
+
 1. Go to: https://github.com/hacs/default
 2. Fork repository
 3. Add your integration to `integration` file
@@ -106,6 +120,7 @@ After testing with custom repository:
 ## What Workflows Do
 
 ### On Every Push/PR:
+
 - ✅ Validates HACS requirements
 - ✅ Validates Home Assistant requirements
 - ✅ Checks JSON files
@@ -113,15 +128,18 @@ After testing with custom repository:
 - ✅ Runs unit tests
 
 ### On Release:
+
 - ✅ Auto-updates version in manifest.json
 - ✅ Commits version bump
 - ✅ Validates release
 
 ### Weekly:
+
 - ✅ Security scan (CodeQL)
 - ✅ Close stale issues/PRs
 
 ### On Pull Requests:
+
 - ✅ All validation checks
 - ✅ Pre-commit hooks
 - ✅ Code quality checks
@@ -129,9 +147,11 @@ After testing with custom repository:
 ## Monitoring
 
 ### Workflow Status
+
 Check workflows: https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions
 
 ### Workflow Badges (Add to README)
+
 ```markdown
 [![Validate](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/workflows/Validate/badge.svg)](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions)
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
@@ -141,12 +161,14 @@ Check workflows: https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions
 ## Pre-commit Hooks
 
 ### Install (Optional but Recommended)
+
 ```bash
 pip install pre-commit
 pre-commit install
 ```
 
 Now every commit will auto-check:
+
 - Code formatting (Black)
 - Import sorting (isort)
 - Linting (Ruff)
@@ -154,6 +176,7 @@ Now every commit will auto-check:
 - No secrets committed
 
 ### Run Manually
+
 ```bash
 pre-commit run --all-files
 ```
@@ -161,16 +184,19 @@ pre-commit run --all-files
 ## Testing
 
 ### Unit Tests
+
 ```bash
 pytest tests/unit/ -v
 ```
 
 ### With Coverage
+
 ```bash
 pytest tests/unit/ -v --cov=custom_components/solarguardian --cov-report=html
 ```
 
 ### Integration Tests (Real API)
+
 ```bash
 pytest tests/integration/ -v
 ```
@@ -178,9 +204,11 @@ pytest tests/integration/ -v
 ## Common Issues
 
 ### "Action not found" in Workflows
+
 Normal - GitHub Actions will resolve when pushed to GitHub.
 
 ### Workflow Fails: Code Formatting
+
 ```bash
 black custom_components/solarguardian/
 isort custom_components/solarguardian/
@@ -189,16 +217,19 @@ git push
 ```
 
 ### Workflow Fails: Tests
+
 Make sure pytest is configured correctly in `pyproject.toml` (already done ✅).
 
 ## Benefits
 
 ### ✅ For Users
+
 - Easy installation via HACS
 - Automatic updates
 - Trust badge (validated integration)
 
 ### ✅ For You
+
 - Automated validation
 - Security scanning
 - Professional presentation
@@ -236,10 +267,10 @@ pyproject.toml                   # Python tools config
 
 ## Summary
 
-**Total Files Added**: 23 files (1,815 lines)  
-**Workflows**: 7 automated workflows  
-**Documentation**: 4 new docs + templates  
-**Status**: ✅ HACS Compatible  
+**Total Files Added**: 23 files (1,815 lines)
+**Workflows**: 7 automated workflows
+**Documentation**: 4 new docs + templates
+**Status**: ✅ HACS Compatible
 
 ## Resources
 

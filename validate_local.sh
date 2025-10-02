@@ -105,29 +105,29 @@ import sys
 try:
     with open('custom_components/solarguardian/manifest.json') as f:
         manifest = json.load(f)
-    
+
     required = ['domain', 'name', 'documentation', 'issue_tracker', 'version', 'requirements', 'codeowners']
     missing = [f for f in required if f not in manifest]
-    
+
     if missing:
         print(f"  ❌ Missing required fields: {', '.join(missing)}")
         sys.exit(1)
-    
+
     # Check domain matches directory name
     if manifest['domain'] != 'solarguardian':
         print(f"  ❌ Domain '{manifest['domain']}' doesn't match directory name")
         sys.exit(1)
-    
+
     # Check version format
     version = manifest['version']
     if not version or len(version.split('.')) < 2:
         print(f"  ❌ Invalid version format: {version}")
         sys.exit(1)
-    
+
     print("  ✅ All required fields present")
     print(f"  ✅ Domain: {manifest['domain']}")
     print(f"  ✅ Version: {version}")
-    
+
 except Exception as e:
     print(f"  ❌ Error: {e}")
     sys.exit(1)

@@ -1,33 +1,35 @@
 """Unit tests for SolarGuardian sensors."""
-import unittest
-from unittest.mock import MagicMock, AsyncMock, patch
-from datetime import datetime
+
+import os
 
 # Add custom components to path
 import sys
-import os
+import unittest
+from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(current_dir, '../../custom_components'))
+sys.path.insert(0, os.path.join(current_dir, "../../custom_components"))
 
 from solarguardian.const import (
-    DOMAIN,
+    DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_POWER,
     DEVICE_CLASS_VOLTAGE,
-    DEVICE_CLASS_CURRENT,
-    UNIT_WATT,
-    UNIT_VOLT,
-    UNIT_AMPERE,
-    MOCK_POWER_STATION,
+    DOMAIN,
     MOCK_DEVICE,
-    MOCK_VARIABLE_GROUPS
+    MOCK_POWER_STATION,
+    MOCK_VARIABLE_GROUPS,
+    UNIT_AMPERE,
+    UNIT_VOLT,
+    UNIT_WATT,
 )
 
 # Mock homeassistant dependencies
 try:
-    from homeassistant.helpers.entity import Entity
-    from homeassistant.helpers.update_coordinator import CoordinatorEntity
     from homeassistant.components.sensor import SensorEntity
     from homeassistant.const import STATE_UNAVAILABLE
+    from homeassistant.helpers.entity import Entity
+    from homeassistant.helpers.update_coordinator import CoordinatorEntity
 except ImportError:
     # Create mock classes if homeassistant is not available
     class Entity:
@@ -41,19 +43,19 @@ except ImportError:
             self._attr_native_unit_of_measurement = None
             self._attr_device_class = None
             self._attr_extra_state_attributes = {}
-    
+
     class CoordinatorEntity(Entity):
         def __init__(self, coordinator):
             super().__init__()
             self.coordinator = coordinator
-    
+
     class SensorEntity(Entity):
         pass
-    
+
     STATE_UNAVAILABLE = "unavailable"
 
 try:
-    from solarguardian.sensor import async_setup_entry, SolarGuardianSensor
+    from solarguardian.sensor import SolarGuardianSensor, async_setup_entry
 except ImportError:
     # If the sensor module imports fail, we'll skip these tests
     async_setup_entry = None
@@ -67,42 +69,30 @@ class TestSolarGuardianSensor(unittest.TestCase):
         """Set up test fixtures."""
         if SolarGuardianSensor is None:
             self.skipTest("SolarGuardian sensor module not available")
-            
+
         # Mock coordinator
         self.mock_coordinator = MagicMock()
         # Mock coordinator with proper data structure for sensor
         self.mock_coordinator.data = {
-            "power_stations": {
-                "status": 0,
-                "data": {
-                    "list": [MOCK_POWER_STATION]
-                }
-            },
+            "power_stations": {"status": 0, "data": {"list": [MOCK_POWER_STATION]}},
             "devices": {
-                MOCK_POWER_STATION["id"]: {
-                    "status": 0,
-                    "data": {
-                        "list": [MOCK_DEVICE]
-                    }
-                }
+                MOCK_POWER_STATION["id"]: {"status": 0, "data": {"list": [MOCK_DEVICE]}}
             },
             "device_data": {
                 MOCK_DEVICE["id"]: {
                     "status": 0,
-                    "data": {
-                        "variableGroupList": MOCK_VARIABLE_GROUPS
-                    },
+                    "data": {"variableGroupList": MOCK_VARIABLE_GROUPS},
                     "latest_data": {
                         "data": {
                             "list": [
                                 {"dataIdentifier": "OutputPower", "value": "1500"},
                                 {"dataIdentifier": "OutputVoltage", "value": "240.5"},
-                                {"dataIdentifier": "OutputCurrent", "value": "6.25"}
+                                {"dataIdentifier": "OutputCurrent", "value": "6.25"},
                             ]
                         }
-                    }
+                    },
                 }
-            }
+            },
         }
 
         # Create sensor for OutputPower
@@ -111,13 +101,13 @@ class TestSolarGuardianSensor(unittest.TestCase):
             "name": "Output Power",
             "unit": "W",
             "device_class": DEVICE_CLASS_POWER,
-            "icon": "mdi:solar-power"
+            "icon": "mdi:solar-power",
         }
         self.sensor = SolarGuardianSensor(
             coordinator=self.mock_coordinator,
             device=MOCK_DEVICE,
             variable=self.power_variable,
-            sensor_config=self.sensor_config
+            sensor_config=self.sensor_config,
         )
 
     def test_sensor_initialization(self):
@@ -153,13 +143,13 @@ class TestSolarGuardianSensor(unittest.TestCase):
             "name": "Output Voltage",
             "unit": "V",
             "device_class": DEVICE_CLASS_VOLTAGE,
-            "icon": "mdi:flash"
+            "icon": "mdi:flash",
         }
         voltage_sensor = SolarGuardianSensor(
             coordinator=self.mock_coordinator,
             device=MOCK_DEVICE,
             variable=voltage_variable,
-            sensor_config=voltage_config
+            sensor_config=voltage_config,
         )
         self.assertEqual(voltage_sensor._attr_device_class, DEVICE_CLASS_VOLTAGE)
 
@@ -170,13 +160,13 @@ class TestSolarGuardianSensor(unittest.TestCase):
             "name": "Output Current",
             "unit": "A",
             "device_class": DEVICE_CLASS_CURRENT,
-            "icon": "mdi:current-dc"
+            "icon": "mdi:current-dc",
         }
         current_sensor = SolarGuardianSensor(
             coordinator=self.mock_coordinator,
             device=MOCK_DEVICE,
             variable=current_variable,
-            sensor_config=current_config
+            sensor_config=current_config,
         )
         self.assertEqual(current_sensor._attr_device_class, DEVICE_CLASS_CURRENT)
 
@@ -188,12 +178,8 @@ class TestSolarGuardianSensor(unittest.TestCase):
     def test_sensor_native_value_unavailable(self):
         """Test sensor native value when data is unavailable."""
         # Mock coordinator with no latest data
-        self.mock_coordinator.data = {
-            "device_data": {
-                MOCK_DEVICE["id"]: {}
-            }
-        }
-        
+        self.mock_coordinator.data = {"device_data": {MOCK_DEVICE["id"]: {}}}
+
         value = self.sensor.native_value
         self.assertIsNone(value)
 
@@ -205,31 +191,33 @@ class TestSolarGuardianSensor(unittest.TestCase):
         """Test sensor unavailability when no data is present."""
         # Mock coordinator with no data
         self.mock_coordinator.data = {}
-        
+
         self.assertFalse(self.sensor.available)
 
     def test_sensor_unavailable_no_coordinator_data(self):
         """Test sensor unavailability when coordinator has no data."""
         self.mock_coordinator.data = None
-        
+
         self.assertFalse(self.sensor.available)
 
     def test_sensor_extra_state_attributes(self):
         """Test sensor extra state attributes."""
         attributes = self.sensor.extra_state_attributes
-        
+
         self.assertIsInstance(attributes, dict)
         self.assertIn("data_identifier", attributes)
         self.assertEqual(attributes["data_identifier"], "OutputPower")
         self.assertIn("device_id", attributes)
         self.assertEqual(attributes["device_id"], MOCK_DEVICE["id"])
         self.assertIn("station_name", attributes)
-        self.assertEqual(attributes["station_name"], MOCK_POWER_STATION["powerStationName"])
+        self.assertEqual(
+            attributes["station_name"], MOCK_POWER_STATION["powerStationName"]
+        )
 
     def test_sensor_extra_attributes_with_timestamp(self):
         """Test sensor extra attributes include timestamp when available."""
         attributes = self.sensor.extra_state_attributes
-        
+
         self.assertIn("last_updated", attributes)
         # The timestamp should be from our mock data
         self.assertIsNotNone(attributes["last_updated"])
@@ -237,7 +225,9 @@ class TestSolarGuardianSensor(unittest.TestCase):
     def test_sensor_name_generation(self):
         """Test sensor name generation for different variables."""
         # Test English name
-        expected_name = f"{MOCK_DEVICE['equipmentName']} {self.power_variable['variableNameE']}"
+        expected_name = (
+            f"{MOCK_DEVICE['equipmentName']} {self.power_variable['variableNameE']}"
+        )
         self.assertEqual(self.sensor._attr_name, expected_name)
 
     def test_sensor_name_fallback_chinese(self):
@@ -247,21 +237,17 @@ class TestSolarGuardianSensor(unittest.TestCase):
             "dataIdentifier": "TestParam",
             "variableNameC": "测试参数",
             "unit": "W",
-            "decimal": "0"
+            "decimal": "0",
         }
-        chinese_config = {
-            "name": "测试参数",
-            "unit": "W",
-            "icon": "mdi:gauge"
-        }
-        
+        chinese_config = {"name": "测试参数", "unit": "W", "icon": "mdi:gauge"}
+
         chinese_sensor = SolarGuardianSensor(
             coordinator=self.mock_coordinator,
             device=MOCK_DEVICE,
             variable=chinese_variable,
-            sensor_config=chinese_config
+            sensor_config=chinese_config,
         )
-        
+
         expected_name = f"{MOCK_DEVICE['equipmentName']} 测试参数"
         self.assertEqual(chinese_sensor._attr_name, expected_name)
 
@@ -272,30 +258,22 @@ class TestSolarGuardianSensor(unittest.TestCase):
             "dataIdentifier": "TestDecimal",
             "variableNameE": "Test Decimal",
             "unit": "V",
-            "decimal": "2"
+            "decimal": "2",
         }
-        decimal_config = {
-            "name": "Test Decimal",
-            "unit": "V",
-            "icon": "mdi:gauge"
-        }
-        
+        decimal_config = {"name": "Test Decimal", "unit": "V", "icon": "mdi:gauge"}
+
         # Mock data with decimal value
         self.mock_coordinator.data["device_data"][MOCK_DEVICE["id"]]["latest_data"] = {
-            "data": {
-                "list": [
-                    {"dataIdentifier": "TestDecimal", "value": "123.456"}
-                ]
-            }
+            "data": {"list": [{"dataIdentifier": "TestDecimal", "value": "123.456"}]}
         }
-        
+
         decimal_sensor = SolarGuardianSensor(
             coordinator=self.mock_coordinator,
             device=MOCK_DEVICE,
             variable=decimal_variable,
-            sensor_config=decimal_config
+            sensor_config=decimal_config,
         )
-        
+
         # Should round to 2 decimal places
         self.assertEqual(decimal_sensor.native_value, 123.46)
 
@@ -309,9 +287,9 @@ class TestSolarGuardianSensor(unittest.TestCase):
         # Mock data with invalid value
         self.mock_coordinator.data["latest_data"][MOCK_DEVICE["id"]]["OutputPower"] = {
             "value": "invalid",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
-        
+
         value = self.sensor.native_value
         self.assertIsNone(value)
 
@@ -320,9 +298,9 @@ class TestSolarGuardianSensor(unittest.TestCase):
         # Mock data with string value
         self.mock_coordinator.data["latest_data"][MOCK_DEVICE["id"]]["OutputPower"] = {
             "value": "1500.75",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
-        
+
         value = self.sensor.native_value
         self.assertEqual(value, 1500.0)  # Should round to 0 decimal places
 
@@ -334,25 +312,21 @@ class TestSensorSetup(unittest.IsolatedAsyncioTestCase):
         """Test async_setup_entry function when import fails."""
         if async_setup_entry is None:
             self.skipTest("async_setup_entry function not available")
-        
+
         # Mock homeassistant objects
         mock_hass = MagicMock()
         mock_entry = MagicMock()
         mock_async_add_entities = AsyncMock()
-        
+
         # Mock coordinator with no data
         mock_coordinator = MagicMock()
         mock_coordinator.data = None
         mock_hass.data = {
-            DOMAIN: {
-                mock_entry.entry_id: {
-                    "coordinator": mock_coordinator
-                }
-            }
+            DOMAIN: {mock_entry.entry_id: {"coordinator": mock_coordinator}}
         }
-        
+
         result = await async_setup_entry(mock_hass, mock_entry, mock_async_add_entities)
-        
+
         # Should return True even with no data
         self.assertTrue(result)
         mock_async_add_entities.assert_called_once_with([])
@@ -378,22 +352,22 @@ class TestSensorConstants(unittest.TestCase):
         self.assertIsInstance(MOCK_POWER_STATION, dict)
         self.assertIn("id", MOCK_POWER_STATION)
         self.assertIn("powerStationName", MOCK_POWER_STATION)
-        
+
         self.assertIsInstance(MOCK_DEVICE, dict)
         self.assertIn("id", MOCK_DEVICE)
         self.assertIn("equipmentName", MOCK_DEVICE)
-        
+
         self.assertIsInstance(MOCK_VARIABLE_GROUPS, list)
         self.assertGreater(len(MOCK_VARIABLE_GROUPS), 0)
-        
+
         for group in MOCK_VARIABLE_GROUPS:
             self.assertIn("variableList", group)
             self.assertIsInstance(group["variableList"], list)
-            
+
             for variable in group["variableList"]:
                 self.assertIn("dataIdentifier", variable)
                 self.assertIn("unit", variable)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

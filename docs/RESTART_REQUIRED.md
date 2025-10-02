@@ -1,9 +1,11 @@
 # Home Assistant Code Reload Instructions
 
 ## Issue
+
 Home Assistant is still running the **old version** of the code, even though the fix has been committed and pushed.
 
 ## Why This Happens
+
 Home Assistant caches Python modules in memory. Simply restarting the integration or reloading YAML is **not enough** to reload custom component code.
 
 ## Solution: Full Restart Required
@@ -18,6 +20,7 @@ Home Assistant caches Python modules in memory. Simply restarting the integratio
 ### Option 2: Command Line Restart
 
 If you have SSH access:
+
 ```bash
 # For Home Assistant OS/Supervised
 ha core restart
@@ -66,9 +69,9 @@ After restart, verify the fix:
 
 ## Expected Behavior After Fix
 
-✅ Integration loads successfully  
-✅ All sensors created (device info + parameters)  
-✅ No errors in logs  
+✅ Integration loads successfully
+✅ All sensors created (device info + parameters)
+✅ No errors in logs
 ✅ Sensors update every 15 seconds (or your configured interval)
 
 ## Troubleshooting
@@ -76,31 +79,36 @@ After restart, verify the fix:
 ### If Error Persists After Restart
 
 1. **Verify file was copied correctly**:
+
    ```bash
    # Check the file on Home Assistant
    cat /config/custom_components/solarguardian/sensor.py | grep -A 5 "device_sensors = 0"
    ```
-   
+
    Should show:
+
    ```python
    # Initialize device sensor counter
    device_sensors = 0
-   
+
    # Add device information sensors
    ```
 
 2. **Check file permissions**:
+
    ```bash
    ls -la /config/custom_components/solarguardian/sensor.py
    ```
+
    Should be readable by Home Assistant user.
 
 3. **Force clear Python cache**:
+
    ```bash
    # Remove Python cache files
    find /config/custom_components/solarguardian -name "*.pyc" -delete
    find /config/custom_components/solarguardian -name "__pycache__" -type d -exec rm -rf {} +
-   
+
    # Then restart Home Assistant
    ha core restart
    ```
@@ -134,6 +142,7 @@ grep -n "device_sensors = 0" custom_components/solarguardian/sensor.py
 ```
 
 Should show:
+
 ```
 388:            # Initialize device sensor counter
 389:            device_sensors = 0
@@ -145,7 +154,8 @@ If line 389 shows `device_sensors = 0`, the fix is correct in your local file.
 
 **The fix is correct in git**, but Home Assistant needs a **full restart** to load the new code.
 
-**Action Required**: 
+**Action Required**:
+
 1. Restart Home Assistant (full restart, not just reload)
 2. Wait 30-60 seconds for restart to complete
 3. Check logs for success
@@ -154,6 +164,6 @@ The error should disappear after the restart! ✅
 
 ---
 
-**Last Updated**: October 1, 2025  
-**Fix Commit**: d9206a8  
+**Last Updated**: October 1, 2025
+**Fix Commit**: d9206a8
 **Status**: Code fixed, restart required

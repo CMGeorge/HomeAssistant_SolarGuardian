@@ -7,6 +7,7 @@ All notable changes to the SolarGuardian Home Assistant integration will be docu
 ### 🚀 Major Improvements
 
 #### Performance & Data Frequency
+
 - **Reduced update interval from 30s to 10s** - Get near real-time solar data updates
   - More responsive sensor readings
   - Faster detection of power changes
@@ -14,6 +15,7 @@ All notable changes to the SolarGuardian Home Assistant integration will be docu
   - Configurable via integration options
 
 #### API Endpoint Fixes
+
 - **Fixed `get_latest_data()` endpoint** - Now correctly uses port 7002
   - Both `get_latest_data()` and `get_latest_data_by_datapoints()` now use the correct port
   - Matches API V2.3 specification for `/history/lastDatapoint` endpoint
@@ -23,6 +25,7 @@ All notable changes to the SolarGuardian Home Assistant integration will be docu
 ### 🔧 Technical Changes
 
 #### API Client (`api.py`)
+
 ```python
 # BEFORE: Used standard port (incorrect)
 await self._make_authenticated_request(ENDPOINT_LATEST_DATA, payload)
@@ -32,6 +35,7 @@ latest_data_url = f"https://{domain_parts}:{LATEST_DATA_PORT}{ENDPOINT_LATEST_DA
 ```
 
 #### Constants (`const.py`)
+
 ```python
 # BEFORE
 DEFAULT_UPDATE_INTERVAL = 30  # seconds
@@ -43,6 +47,7 @@ DEFAULT_UPDATE_INTERVAL = 10  # seconds - update frequently to get near real-tim
 ### 🏗️ Architecture Improvements
 
 #### Test Infrastructure
+
 - **Removed duplicate code** - Created symlink from `tests/custom_components` to `../custom_components`
   - Single source of truth for integration code
   - No need to maintain code in two places
@@ -61,6 +66,7 @@ DEFAULT_UPDATE_INTERVAL = 10  # seconds - update frequently to get near real-tim
 ### 📝 Documentation Updates
 
 #### Updated Files
+
 - `.github/copilot-instructions.md` - Added update interval and rate limit documentation
 - `TESTING_SUCCESS.md` - Documented successful API integration test
 - `CHANGELOG.md` - This file
@@ -75,15 +81,18 @@ DEFAULT_UPDATE_INTERVAL = 10  # seconds - update frequently to get near real-tim
 ### ⚡ Performance Impact
 
 **Update Frequency:**
+
 - **Before**: Every 30 seconds (2 updates/minute)
 - **After**: Every 10 seconds (6 updates/minute)
 
 **API Rate Limits (Respected):**
+
 - Authentication: 10 calls/minute (6s between calls)
 - Data endpoints: 30 calls/minute (2s between calls)
 - Update interval respects rate limits with multiple devices
 
 **Real-World Impact:**
+
 ```
 1 station + 3 devices = 4 API calls per update cycle
 At 10s interval = 6 update cycles/minute = 24 API calls/minute
@@ -113,12 +122,14 @@ Well within 30 calls/minute data limit ✅
 ### 📋 Migration Notes
 
 **For Existing Users:**
+
 - Update will automatically use 10-second interval
 - To customize interval, go to integration settings
 - No configuration changes required
 - Existing sensors will update more frequently
 
 **For New Users:**
+
 - Default 10-second update interval
 - Configurable in integration options
 - Respects API rate limits automatically
@@ -136,6 +147,7 @@ Well within 30 calls/minute data limit ✅
 ## Version History
 
 ### Current Development
+
 - Date: October 1, 2025
 - Status: Testing phase
 - Target: Home Assistant 2025.9.x

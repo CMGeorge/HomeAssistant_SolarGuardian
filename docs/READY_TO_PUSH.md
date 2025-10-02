@@ -2,14 +2,16 @@
 
 ## What You Asked For
 
-> "can you check this https://github.com/CMGeorge/homeassistant_sabiana_smart_energy?  
-> I need validation badges, open in HACS,  
+> "can you check this https://github.com/CMGeorge/homeassistant_sabiana_smart_energy?
+> I need validation badges, open in HACS,
 > I think we need also hassfest.yaml like I'm there?"
 
 ## ✅ All Done!
 
 ### 1. Validation Badges ✅
+
 Added to README.md:
+
 ```markdown
 [![Validate](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions/workflows/validate.yaml/badge.svg)]
 [![hassfest](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions/workflows/hassfest.yaml/badge.svg)]
@@ -19,20 +21,26 @@ Added to README.md:
 ```
 
 ### 2. Open in HACS Button ✅
+
 Added the official HACS button:
+
 ```markdown
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=CMGeorge&repository=HomeAssistant_SolarGuardian&category=integration)
 ```
 
 ### 3. Hassfest Workflow ✅
+
 Created `.github/workflows/hassfest.yaml`:
+
 - Same as Sabiana integration
 - Validates Home Assistant manifest requirements
 - Runs on push, PR, and daily schedule
 - Uses official `home-assistant/actions/hassfest@master`
 
 ### 4. Bonus: info.md ✅
+
 Created `info.md` for HACS UI:
+
 - User-friendly description
 - Feature list with emojis
 - Installation steps
@@ -56,12 +64,15 @@ git push origin master
 ## After Pushing - What to Expect
 
 ### 1. Workflows Will Run
+
 - ✅ `validate.yaml` - HACS validation
 - ✅ `hassfest.yaml` - Home Assistant validation
 - ✅ Other workflows (test, codeql, etc.)
 
 ### 2. Badges Will Appear
+
 Your README will show:
+
 - 🟢 Validate badge (HACS validation status)
 - 🟢 Hassfest badge (HA validation status)
 - 🟠 HACS badge (Custom repository)
@@ -69,6 +80,7 @@ Your README will show:
 - 🔵 License badge (MIT)
 
 ### 3. Users Can Install
+
 - Click "Open in HACS" button
 - Auto-redirects to their HA instance
 - Auto-fills repository details
@@ -77,6 +89,7 @@ Your README will show:
 ## Comparison: Before vs After
 
 ### Your Sabiana Integration Has:
+
 - ✅ Validate workflow
 - ✅ Hassfest workflow
 - ✅ Lint workflow
@@ -84,6 +97,7 @@ Your README will show:
 - ✅ Open in HACS button
 
 ### SolarGuardian Now Has:
+
 - ✅ Validate workflow ← Already had
 - ✅ Hassfest workflow ← **ADDED** 🎉
 - ✅ Lint workflow (via validate.yaml) ← Already had
@@ -109,11 +123,13 @@ Modified:
 ## HACS Documentation Followed ✅
 
 Referenced:
+
 - ✅ https://hacs.xyz/docs/publish/start
 - ✅ https://hacs.xyz/docs/publish/integration
 - ✅ Your Sabiana integration as template
 
 All requirements met:
+
 - ✅ hacs.json present
 - ✅ manifest.json valid
 - ✅ Repository structure correct
@@ -124,6 +140,7 @@ All requirements met:
 ## Summary
 
 **What was done**: Added missing HACS validation elements by following:
+
 1. HACS official documentation
 2. Your Sabiana integration as reference
 3. Industry best practices
@@ -137,6 +154,7 @@ git push origin master
 ```
 
 After pushing, check:
+
 - https://github.com/CMGeorge/HomeAssistant_SolarGuardian (badges visible)
 - https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions (workflows running)
 

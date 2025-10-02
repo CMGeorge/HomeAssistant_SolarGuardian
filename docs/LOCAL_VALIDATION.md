@@ -80,6 +80,7 @@ jq '.domain, .name, .documentation, .issue_tracker, .version, .requirements, .co
 ```
 
 **What it checks:**
+
 - ✅ `manifest.json` syntax is valid
 - ✅ All required fields present
 - ✅ URLs are accessible
@@ -117,6 +118,7 @@ jq '.name, .render_readme' hacs.json
 ```
 
 **What it checks:**
+
 - ✅ `hacs.json` is valid
 - ✅ `README.md` exists
 - ✅ `info.md` exists
@@ -270,6 +272,7 @@ pre-commit run --all-files
 ```
 
 **What pre-commit does:**
+
 - ✅ Runs Black formatting
 - ✅ Runs isort
 - ✅ Runs Ruff
@@ -498,17 +501,20 @@ docker run --rm -v $(pwd):/workspace ghcr.io/home-assistant/home-assistant:dev p
 ## ✅ Summary
 
 **Install Once:**
+
 ```bash
 pip install homeassistant pre-commit black isort ruff pytest
 pre-commit install
 ```
 
 **Run Before Push:**
+
 ```bash
 ./validate_local.sh
 ```
 
 **Auto-format:**
+
 ```bash
 black custom_components/
 isort custom_components/

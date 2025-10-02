@@ -18,11 +18,13 @@ Thank you for your interest in contributing! This document provides guidelines f
 ## Development Setup
 
 ### Prerequisites
+
 - Python 3.12 or higher
 - Home Assistant 2025.9.0 or higher
 - SolarGuardian API credentials (for testing)
 
 ### Install Development Dependencies
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
@@ -32,7 +34,9 @@ pre-commit install
 ```
 
 ### Testing Setup
+
 Create a `.env` file in the `tests/` directory:
+
 ```bash
 APP_KEY=your_test_app_key
 APP_SECRET=your_test_app_secret
@@ -44,12 +48,14 @@ DOMAIN=glapi.mysolarguardian.com  # or openapi.epsolarpv.com
 ## Code Standards
 
 ### Python Style
+
 - Follow **PEP 8** style guidelines
 - Use **Black** for code formatting (line length: 88)
 - Use **isort** for import sorting
 - Use **Ruff** for linting
 
 Run formatters before committing:
+
 ```bash
 black custom_components/solarguardian/
 isort custom_components/solarguardian/
@@ -57,30 +63,34 @@ ruff check custom_components/solarguardian/ --fix
 ```
 
 Or use pre-commit (automatically runs on commit):
+
 ```bash
 pre-commit run --all-files
 ```
 
 ### Type Hints
+
 - Use type hints for all function parameters and return values
 - Use `from __future__ import annotations` at the top of files
 
 ### Docstrings
+
 - Use Google-style docstrings
 - Document all public functions and classes
 - Include examples for complex functionality
 
 Example:
+
 ```python
 async def get_devices(self, station_id: int) -> dict:
     """Get all devices for a power station.
-    
+
     Args:
         station_id: The ID of the power station.
-        
+
     Returns:
         Dict containing device list and metadata.
-        
+
     Raises:
         SolarGuardianAPIError: If API request fails.
     """
@@ -89,32 +99,38 @@ async def get_devices(self, station_id: int) -> dict:
 ## Testing Requirements
 
 ### Test Categories
+
 1. **Unit Tests** (`tests/unit/`): Test individual components
 2. **Integration Tests** (`tests/integration/`): Test with real API
 
 ### Running Tests
 
 **Unit Tests** (fast, no API required):
+
 ```bash
 pytest tests/unit/ -v
 ```
 
 **Integration Tests** (requires API credentials):
+
 ```bash
 pytest tests/integration/ -v
 ```
 
 **All Tests**:
+
 ```bash
 pytest tests/ -v
 ```
 
 **With Coverage**:
+
 ```bash
 pytest tests/ -v --cov=custom_components/solarguardian --cov-report=html
 ```
 
 ### Testing Guidelines
+
 - ✅ **Always test with real API** - No mocks for API testing
 - ✅ Write tests for new features
 - ✅ Update tests when changing existing code
@@ -124,12 +140,14 @@ pytest tests/ -v --cov=custom_components/solarguardian --cov-report=html
 ## Security Guidelines
 
 ### NEVER Commit Sensitive Data
+
 - ❌ API keys (appKey, appSecret)
 - ❌ Access tokens
 - ❌ User credentials
 - ❌ Device serial numbers (when identifiable)
 
 ### Log Safely
+
 ```python
 # ❌ WRONG
 _LOGGER.debug(f"Using API key: {api_key}")
@@ -139,6 +157,7 @@ _LOGGER.debug(f"Using API key: {api_key[:8]}...")
 ```
 
 ### Use Environment Variables
+
 ```python
 import os
 from dotenv import load_dotenv
@@ -160,6 +179,7 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 ```
 
 ### Types
+
 - **feat**: New feature
 - **fix**: Bug fix
 - **docs**: Documentation changes
@@ -169,6 +189,7 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 - **chore**: Maintenance tasks
 
 ### Examples
+
 ```
 feat(sensor): Add battery temperature sensor
 
@@ -197,22 +218,27 @@ Fixes #456
 6. **Create Pull Request** with clear description
 
 ### PR Template
+
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Tested with real API
 - [ ] Unit tests pass
 - [ ] Integration tests pass
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated
@@ -222,10 +248,12 @@ Brief description of changes
 ## API Integration Guidelines
 
 ### Rate Limits
+
 - **Authentication**: 10 calls/minute (6 seconds between calls)
 - **Data Endpoints**: 30 calls/minute (2 seconds between calls)
 
 ### Error Handling
+
 ```python
 try:
     result = await self.api.get_something()
@@ -240,6 +268,7 @@ except SolarGuardianAPIError as err:
 ```
 
 ### API Documentation
+
 Refer to `/solarguardian_api.txt` for endpoint details.
 
 ## Home Assistant Guidelines

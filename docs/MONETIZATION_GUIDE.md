@@ -11,6 +11,7 @@ This guide explains ethical ways to monetize your Home Assistant integration whi
 **Best For**: Community support, no barriers to access
 
 **Platforms**:
+
 - **GitHub Sponsors** - Built into GitHub, no fees for open source
 - **Buy Me a Coffee** - Simple, 5% fee
 - **Ko-fi** - No fees, optional 5% tip
@@ -18,26 +19,30 @@ This guide explains ethical ways to monetize your Home Assistant integration whi
 - **PayPal/Venmo** - Direct donations
 
 **Setup**:
+
 1. Create accounts on your chosen platforms
 2. Update `.github/FUNDING.yml` with your usernames
 3. Add donation links to README.md
 4. Mention in release notes and documentation
 
 **Example FUNDING.yml**:
+
 ```yaml
 github: CMGeorge
 buy_me_a_coffee: yourusername
 ko_fi: yourusername
-custom: ['https://paypal.me/YourPayPalUsername']
+custom: ["https://paypal.me/YourPayPalUsername"]
 ```
 
 **Pros**:
+
 - ✅ Keeps integration free
 - ✅ Community-friendly
 - ✅ No license conflicts
 - ✅ Easy setup
 
 **Cons**:
+
 - ⚠️ Unpredictable income
 - ⚠️ Relies on goodwill
 
@@ -48,10 +53,12 @@ custom: ['https://paypal.me/YourPayPalUsername']
 **Best For**: Advanced features or professional users
 
 **Structure**:
+
 - **Free Version**: Core integration (AGPL-3.0)
 - **Premium Features**: Optional paid add-ons
 
 **Premium Feature Ideas**:
+
 - 🔔 Advanced notifications and alerts
 - 📊 Extended analytics and reporting
 - 🤖 Automation templates and blueprints
@@ -61,6 +68,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 - 🔐 Multi-site management
 
 **Important**:
+
 - Free version MUST be fully functional
 - Premium features must be separate from core
 - Clear separation of free/premium code
@@ -73,6 +81,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 **Best For**: Creators and educators
 
 **Options**:
+
 - **YouTube Channel** - Ad revenue, sponsorships
 - **Paid Courses** - Udemy, Teachable, Gumroad
 - **Ebooks/Guides** - Setup guides, best practices
@@ -80,6 +89,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 - **Live Training** - Workshops, webinars
 
 **Content Ideas**:
+
 - Setup tutorials for SolarGuardian
 - Solar energy optimization guides
 - Home automation best practices
@@ -93,6 +103,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 **Best For**: Developers with time for client work
 
 **Services**:
+
 - **Installation Support** - Paid setup assistance
 - **Custom Configurations** - Tailored automations
 - **Integration Development** - Custom features
@@ -100,6 +111,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 - **Maintenance Contracts** - Ongoing support
 
 **Pricing Models**:
+
 - Hourly rate ($50-150/hour)
 - Project-based pricing
 - Monthly support contracts
@@ -112,6 +124,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 **Best For**: Scaling to business users
 
 **Options**:
+
 - **Cloud-hosted Version** - SaaS subscription
 - **Enterprise Features** - Multi-tenant, SSO, compliance
 - **White Label** - Rebrandable version for partners
@@ -119,6 +132,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 - **Commercial License** - For businesses requiring different terms
 
 **Pricing Examples**:
+
 - Personal: Free (open source)
 - Professional: $5-10/month
 - Business: $20-50/month
@@ -131,12 +145,14 @@ custom: ['https://paypal.me/YourPayPalUsername']
 **Best For**: Recommending related products
 
 **Opportunities**:
+
 - Solar hardware (inverters, panels)
 - Home Assistant hardware (Raspberry Pi, etc.)
 - Smart home devices
 - Energy monitoring equipment
 
 **Platforms**:
+
 - Amazon Associates
 - Manufacturer affiliate programs
 - Home automation retailers
@@ -146,18 +162,21 @@ custom: ['https://paypal.me/YourPayPalUsername']
 ## ❌ What NOT to Do
 
 ### License Violations
+
 - ❌ Making the core integration paid-only
 - ❌ Removing open source version
 - ❌ Violating AGPL-3.0 terms
 - ❌ Blocking access without payment
 
 ### Community Harm
+
 - ❌ Aggressive monetization tactics
 - ❌ Pay-to-fix-bugs model
 - ❌ Deliberate feature crippling
 - ❌ Spamming donation requests
 
 ### Home Assistant Guidelines
+
 - ❌ Integrations requiring payment for basic functionality
 - ❌ Integrations with ads in the UI
 - ❌ Tracking users without consent
@@ -168,6 +187,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 ## 📋 Recommended Monetization Strategy
 
 ### Phase 1: Build Community (0-6 months)
+
 1. Keep everything free and open source
 2. Focus on quality and features
 3. Build user base and reputation
@@ -177,6 +197,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 **Goal**: 100+ stars, active users, good reviews
 
 ### Phase 2: Gentle Monetization (6-12 months)
+
 1. Add prominent donation buttons
 2. Create educational content (YouTube/blog)
 3. Offer optional consulting services
@@ -186,6 +207,7 @@ custom: ['https://paypal.me/YourPayPalUsername']
 **Goal**: $100-500/month passive income
 
 ### Phase 3: Scale (12+ months)
+
 1. Develop premium features (separate repo/license)
 2. Create paid courses or ebooks
 3. Offer premium support tiers
@@ -199,18 +221,21 @@ custom: ['https://paypal.me/YourPayPalUsername']
 ## 💡 Best Practices
 
 ### Transparency
+
 - ✅ Be clear about what's free vs. paid
 - ✅ Explain where donations go
 - ✅ Share your monetization plans with community
 - ✅ Keep free version fully functional
 
 ### Community First
+
 - ✅ Never compromise quality for monetization
 - ✅ Accept contributions regardless of donations
 - ✅ Provide excellent free support
 - ✅ Keep documentation accessible
 
 ### Value Proposition
+
 - ✅ Premium features should be truly premium
 - ✅ Free version solves real problems
 - ✅ Paid options offer clear value
@@ -223,17 +248,20 @@ custom: ['https://paypal.me/YourPayPalUsername']
 ### Realistic Numbers (based on community projects)
 
 **Small Project** (100-500 users):
+
 - Donations: $50-200/month
 - Consulting: $200-500/month (if offered)
 - Total: $250-700/month
 
 **Medium Project** (500-2000 users):
+
 - Donations: $200-800/month
 - Premium features: $300-1000/month
 - Consulting: $500-1500/month
 - Total: $1000-3300/month
 
 **Large Project** (2000+ users):
+
 - Donations: $800-2000/month
 - Premium features: $1000-5000/month
 - Consulting/Enterprise: $2000-10000/month
@@ -302,13 +330,16 @@ custom: ['https://paypal.me/YourPayPalUsername']
 ## 📞 Community Resources
 
 ### Learn From Others
+
 - **Popular HA Integrations**: Check their monetization
 - **GitHub Sponsors**: See successful profiles
 - **r/homeassistant**: Ask for advice
 - **Discord**: Join HA development channels
 
 ### Inspiration
+
 Many successful HA developers use:
+
 - GitHub Sponsors + Ko-fi combo
 - Free core + paid cloud hosting
 - Consulting + donations
@@ -319,17 +350,20 @@ Many successful HA developers use:
 ## ⚖️ Legal Considerations
 
 ### Tax Implications
+
 - Donations may be taxable income
 - Consult local tax professional
 - Keep records of all income
 
 ### License Compliance
+
 - AGPL-3.0 requires source availability
 - Premium features need careful licensing
 - Dual licensing is complex but possible
 - Consider lawyer consultation for business model
 
 ### Terms of Service
+
 - Create clear ToS for paid services
 - Define refund policy
 - Clarify support expectations

@@ -7,6 +7,7 @@ This repository is now fully HACS compatible with comprehensive validation workf
 ### 1. GitHub Actions Workflows (`.github/workflows/`)
 
 #### `validate.yaml` - Main Validation Pipeline
+
 - ✅ **HACS Validation**: Official HACS action validates integration structure
 - ✅ **Hassfest Validation**: Home Assistant's official validator
 - ✅ **JSON Validation**: Validates all JSON files (manifest, hacs, strings, translations)
@@ -14,36 +15,43 @@ This repository is now fully HACS compatible with comprehensive validation workf
 - ✅ **Manifest Requirements**: Ensures all required fields present
 
 #### `test.yaml` - Testing Pipeline
+
 - ✅ **Unit Tests**: Runs on Python 3.12 and 3.13
 - ✅ **Code Coverage**: Reports coverage to Codecov
 - ✅ **Integration Tests**: Optional (manual trigger) with real API
 
 #### `release.yaml` - Release Automation
+
 - ✅ Auto-updates version in manifest.json
 - ✅ Commits version bump
 - ✅ Validates release
 
 #### `codeql.yaml` - Security Analysis
+
 - ✅ Weekly security scans
 - ✅ GitHub CodeQL analysis
 - ✅ Automatic security alerts
 
 #### `pre-commit.yaml` - Pre-commit Checks
+
 - ✅ Runs pre-commit hooks on PRs
 - ✅ Ensures code quality before merge
 
 #### `stale.yaml` - Stale Issue Management
+
 - ✅ Auto-closes stale issues (60 days + 7 days warning)
 - ✅ Auto-closes stale PRs (30 days + 7 days warning)
 - ✅ Respects pinned/critical labels
 
 #### `labels.yaml` - Label Management
+
 - ✅ Auto-syncs repository labels
 - ✅ Consistent labeling across issues/PRs
 
 ### 2. Configuration Files
 
 #### `hacs.json` - HACS Configuration
+
 ```json
 {
   "name": "SolarGuardian",
@@ -55,17 +63,20 @@ This repository is now fully HACS compatible with comprehensive validation workf
   "render_readme": true
 }
 ```
+
 - ✅ Fixed typo: `Cloud Polling` → `cloud_polling`
 - ✅ Added country tags for discoverability
 - ✅ Enabled README rendering
 
 #### `manifest.json` - Integration Manifest
+
 - ✅ Fixed typo in documentation URL
 - ✅ Fixed typo in issue_tracker URL
 - Was: `HomeAssistant_SolarGuardina` (typo)
 - Now: `HomeAssistant_SolarGuardian` (correct)
 
 #### `.pre-commit-config.yaml` - Pre-commit Hooks
+
 - Black (code formatting)
 - isort (import sorting)
 - Ruff (linting)
@@ -73,6 +84,7 @@ This repository is now fully HACS compatible with comprehensive validation workf
 - Security checks (detect private keys)
 
 #### `pyproject.toml` - Python Project Configuration
+
 - Black configuration (line-length: 88)
 - isort configuration (Black-compatible)
 - Ruff linting rules
@@ -80,21 +92,25 @@ This repository is now fully HACS compatible with comprehensive validation workf
 - Coverage settings
 
 #### `.github/dependabot.yml` - Dependency Updates
+
 - Auto-updates GitHub Actions weekly
 - Auto-updates Python dependencies weekly
 
 ### 3. GitHub Templates
 
 #### Issue Templates
+
 - `bug_report.md` - Structured bug reports
 - `feature_request.md` - Feature requests with API context
 
 #### Pull Request Template
+
 - `PULL_REQUEST_TEMPLATE.md` - PR checklist and guidelines
 
 ### 4. Documentation
 
 #### `CONTRIBUTING.md` - Contribution Guidelines
+
 - Development setup instructions
 - Code standards (Black, isort, Ruff)
 - Testing requirements
@@ -103,16 +119,19 @@ This repository is now fully HACS compatible with comprehensive validation workf
 - PR process
 
 #### `SECURITY.md` - Security Policy
+
 - Vulnerability reporting process
 - Supported versions
 - API credentials security
 - Responsible disclosure policy
 
 #### `.github/CODEOWNERS` - Code Ownership
+
 - Automatic PR review requests
 - Component-specific ownership
 
 #### `.github/labels.yml` - Label Definitions
+
 - Bug labels (bug, critical)
 - Enhancement labels
 - Documentation labels
@@ -123,6 +142,7 @@ This repository is now fully HACS compatible with comprehensive validation workf
 ### 5. Git Configuration
 
 #### `.gitattributes` - Git Attributes
+
 - Auto-detects text files
 - Enforces LF line endings
 - Excludes test files from exports
@@ -158,6 +178,7 @@ This repository is now fully HACS compatible with comprehensive validation workf
 ## Workflow Status
 
 All workflows will run automatically on:
+
 - ✅ Push to `master` branch
 - ✅ Pull requests
 - ✅ Release creation
@@ -167,12 +188,15 @@ All workflows will run automatically on:
 ## Adding to HACS
 
 ### Option 1: Official HACS Default Repository
+
 1. Repository must be public
 2. Submit PR to [HACS Default repository](https://github.com/hacs/default)
 3. Wait for HACS team review and approval
 
 ### Option 2: Custom Repository (Immediate)
+
 Users can add your repository manually:
+
 1. Open HACS in Home Assistant
 2. Click "..." menu → "Custom repositories"
 3. Add repository URL: `https://github.com/CMGeorge/HomeAssistant_SolarGuardian`
@@ -184,29 +208,32 @@ Users can add your repository manually:
 ### Before First Release
 
 1. **Test workflows locally**:
+
    ```bash
    # Install pre-commit
    pip install pre-commit
    pre-commit install
-   
+
    # Run all pre-commit hooks
    pre-commit run --all-files
    ```
 
 2. **Run tests**:
+
    ```bash
    # Unit tests
    pytest tests/unit/ -v
-   
+
    # With coverage
    pytest tests/unit/ -v --cov=custom_components/solarguardian
    ```
 
 3. **Validate manually**:
+
    ```bash
    # Install validation tools
    pip install black isort ruff
-   
+
    # Check formatting
    black --check custom_components/solarguardian/
    isort --check-only custom_components/solarguardian/
@@ -214,11 +241,12 @@ Users can add your repository manually:
    ```
 
 4. **Create first release**:
+
    ```bash
    # Create and push tag
    git tag -a v1.0.0 -m "Release v1.0.0"
    git push origin v1.0.0
-   
+
    # Create GitHub release
    # Go to: https://github.com/CMGeorge/HomeAssistant_SolarGuardian/releases/new
    # Tag: v1.0.0
@@ -288,16 +316,19 @@ git push origin master
 ## Monitoring Workflows
 
 Once pushed, you can monitor workflows at:
+
 - https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions
 
 ### Expected Status
 
 After pushing:
+
 - ✅ `Validate` workflow should pass
 - ⚠️ `Test` workflow might fail if no pytest configs (optional)
 - ⚠️ `Pre-commit` workflow might fail if code needs formatting
 
 Fix formatting if needed:
+
 ```bash
 black custom_components/solarguardian/
 isort custom_components/solarguardian/
@@ -309,12 +340,14 @@ git push
 ## Benefits
 
 ### For Users
+
 - ✅ Easy installation via HACS
 - ✅ Automatic updates
 - ✅ Trusted validation
 - ✅ Professional presentation
 
 ### For Maintainers
+
 - ✅ Automated validation on every commit
 - ✅ Consistent code quality
 - ✅ Security scanning
@@ -323,6 +356,7 @@ git push
 - ✅ Professional GitHub presence
 
 ### For Contributors
+
 - ✅ Clear contribution guidelines
 - ✅ Pre-commit hooks ensure quality
 - ✅ Templates for issues/PRs
@@ -332,9 +366,11 @@ git push
 ## Troubleshooting
 
 ### Workflow Fails: "Unable to resolve action"
+
 This is normal - GitHub Actions will resolve on first push to GitHub.
 
 ### Pre-commit Hook Fails
+
 ```bash
 # Fix formatting
 black custom_components/solarguardian/
@@ -347,9 +383,11 @@ git commit -m "style: Fix code formatting"
 ```
 
 ### HACS Validation Fails
+
 Check logs at: https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions
 
 Common issues:
+
 - Missing required manifest fields → Already fixed ✅
 - Invalid JSON → All validated ✅
 - Wrong directory structure → Already correct ✅
@@ -364,9 +402,9 @@ Common issues:
 
 ---
 
-**Setup Complete**: October 2, 2025 ✅  
-**HACS Compatible**: Yes ✅  
-**Workflows Active**: 7 workflows ✅  
-**Documentation**: Complete ✅  
+**Setup Complete**: October 2, 2025 ✅
+**HACS Compatible**: Yes ✅
+**Workflows Active**: 7 workflows ✅
+**Documentation**: Complete ✅
 
 Your integration is now professional-grade and ready for the community! 🎉

@@ -1,8 +1,8 @@
 # Device Status Sensor - Technical Documentation
 
-**Date**: October 1, 2025  
-**Sensor**: `sensor.{device_name}_device_status`  
-**Type**: Numeric bitmask status register  
+**Date**: October 1, 2025
+**Sensor**: `sensor.{device_name}_device_status`
+**Type**: Numeric bitmask status register
 **User System**: Off-grid solar installation
 
 ## Overview
@@ -19,6 +19,7 @@ The **Device Status** sensor displays a numeric value representing the inverter'
 ## Off-Grid System Analysis
 
 ### User's System Configuration
+
 - **Type**: Off-grid (no utility/grid connection)
 - **Typical Status**: 5249
 - **Binary**: `0b1010010000001`
@@ -26,14 +27,15 @@ The **Device Status** sensor displays a numeric value representing the inverter'
 
 ### Active Bits (Status 5249)
 
-| Bit | Decimal | Likely Meaning | Status |
-|-----|---------|----------------|--------|
-| 0 | 1 | System Running | ✓ Active |
-| 7 | 128 | Battery Mode / Off-Grid Operation | ✓ Active |
-| 10 | 1024 | Solar Charging / Battery Active | ✓ Active |
-| 12 | 4096 | Inverter Output Active | ✓ Active |
+| Bit | Decimal | Likely Meaning                    | Status   |
+| --- | ------- | --------------------------------- | -------- |
+| 0   | 1       | System Running                    | ✓ Active |
+| 7   | 128     | Battery Mode / Off-Grid Operation | ✓ Active |
+| 10  | 1024    | Solar Charging / Battery Active   | ✓ Active |
+| 12  | 4096    | Inverter Output Active            | ✓ Active |
 
 **Interpretation**: Normal off-grid operation
+
 - System is operational
 - Running in battery/solar mode (no grid)
 - PV charging or battery supplying power
@@ -51,7 +53,7 @@ Since this is a **bitmask**, the value changes as operating conditions change:
 # Daytime - Solar charging, loads active
 5249 = bits 0,7,10,12 (Running, Battery mode, Charging, Output)
 
-# Night - Battery only, loads active  
+# Night - Battery only, loads active
 4225 = bits 0,7,12 (Running, Battery mode, Output)
 # (bit 10 off = no solar input)
 
@@ -96,15 +98,15 @@ template:
       - name: "Solar Inverter Running"
         state: "{{ states('sensor.solar_inverter_device_status') | int | bitwise_and(1) > 0 }}"
         device_class: power
-        
+
       - name: "Solar Inverter Battery Mode"
         state: "{{ states('sensor.solar_inverter_device_status') | int | bitwise_and(128) > 0 }}"
         device_class: battery
-        
+
       - name: "Solar Inverter Charging Active"
         state: "{{ states('sensor.solar_inverter_device_status') | int | bitwise_and(1024) > 0 }}"
         device_class: battery_charging
-        
+
       - name: "Solar Inverter Output Active"
         state: "{{ states('sensor.solar_inverter_device_status') | int | bitwise_and(4096) > 0 }}"
         device_class: power
@@ -118,7 +120,7 @@ template:
     - platform: numeric_state
       entity_id: sensor.solar_inverter_device_status
       # Alert if value changes significantly from normal
-      above: 6000  # Or below 4000
+      above: 6000 # Or below 4000
   action:
     - service: notify.mobile_app
       data:
@@ -132,13 +134,13 @@ template:
 
 For off-grid systems, typical status values might be:
 
-| Scenario | Typical Range | Description |
-|----------|---------------|-------------|
-| Day + Loads | 5000-5500 | Solar charging, output active |
-| Day + No loads | 1000-1500 | Solar charging only |
-| Night + Loads | 4000-4500 | Battery discharge, output active |
-| Night + No loads | 100-200 | Standby mode |
-| Fault | Variable | Unusual bit patterns |
+| Scenario         | Typical Range | Description                      |
+| ---------------- | ------------- | -------------------------------- |
+| Day + Loads      | 5000-5500     | Solar charging, output active    |
+| Day + No loads   | 1000-1500     | Solar charging only              |
+| Night + Loads    | 4000-4500     | Battery discharge, output active |
+| Night + No loads | 100-200       | Standby mode                     |
+| Fault            | Variable      | Unusual bit patterns             |
 
 ### Correlation with Other Sensors
 
@@ -224,16 +226,19 @@ hours_to_show: 24
 ## Troubleshooting
 
 ### Status Value Never Changes
+
 - Normal if operating conditions are stable
 - Check other sensors to verify system is active
 
 ### Unexpected Status Values
+
 - Note the value
 - Check other sensors for clues
 - Look for error messages in logs
 - May indicate fault condition
 
 ### Status Shows 0 or None
+
 - Communication issue with device
 - Check other sensors also showing Unknown
 - Integration may need restart
@@ -241,6 +246,7 @@ hours_to_show: 24
 ## Technical Details
 
 ### API Response Format
+
 ```json
 {
   "dataPointId": 105646595,
@@ -252,6 +258,7 @@ hours_to_show: 24
 ```
 
 ### Sensor Configuration
+
 ```python
 # In sensor.py
 {
@@ -264,6 +271,7 @@ hours_to_show: 24
 ```
 
 ### Value Processing
+
 - Raw API value: "5249.00"
 - Displayed as: 5249.00 (or 5249)
 - No decimal division applied for status registers
@@ -272,6 +280,7 @@ hours_to_show: 24
 ## Related Sensors
 
 **Other Status Indicators**:
+
 - `sensor.{device}_pv_charging_status` - Solar charging state (enum)
 - `sensor.{device}_utility_charging_status` - Grid charging state (enum)
 - `sensor.{device}_output_load_status` - Load condition (enum)
@@ -290,6 +299,7 @@ If you discover patterns in your Device Status values:
 3. **Help others**: Your off-grid experience is valuable!
 
 Example contribution:
+
 ```
 Status 5249: Normal day operation (solar + loads)
 Status 4225: Normal night operation (battery + loads)
@@ -298,7 +308,7 @@ Status 129: Standby mode (no loads)
 
 ---
 
-**Status**: ✅ Sensor working correctly (shows numeric bitmask)  
-**User System**: Off-grid solar installation  
-**Typical Value**: 5249 (normal operation)  
+**Status**: ✅ Sensor working correctly (shows numeric bitmask)
+**User System**: Off-grid solar installation
+**Typical Value**: 5249 (normal operation)
 **Enhancement**: Awaiting bit definitions for full decoding

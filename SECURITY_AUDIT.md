@@ -9,23 +9,28 @@ This document records the security measures taken to ensure this public reposito
 ## ✅ Actions Taken
 
 ### 1. Credential Removal from Git History
+
 **Issue Found**: Partial API key was exposed in `docs/TEST_RESULTS_OCTOBER_1.md` across multiple commits in git history.
 
 **Resolution**:
+
 - ✅ Used `git-filter-repo` to permanently remove credential from ALL git history
 - ✅ Replaced all occurrences with `[REDACTED]` in 25 commits
 - ✅ Verified complete removal from all branches and history
 - ✅ Commit created: `316984f - security: Redact API credentials from test results documentation`
 
 **Commands Used**:
+
 ```bash
 git-filter-repo --replace-text <(echo 'EXPOSED_SECRET==>[REDACTED]') --force
 ```
 
 ### 2. Local Credential File Removal
+
 **Issue Found**: `tests/.env` contained real API credentials (APP_KEY and APP_SECRET).
 
 **Resolution**:
+
 - ✅ Deleted `tests/.env` file completely
 - ✅ File was never committed to git (properly ignored)
 - ✅ `.gitignore` properly configured to ignore all `.env` files
@@ -34,7 +39,9 @@ git-filter-repo --replace-text <(echo 'EXPOSED_SECRET==>[REDACTED]') --force
 **Note**: Users must create their own `tests/.env` from `tests/.env.example` for testing.
 
 ### 3. Git History Verification
+
 **Verification Steps**:
+
 ```bash
 # Search entire history for credentials
 git grep "EXPOSED_SECRET" $(git rev-list --all)
@@ -54,9 +61,11 @@ git check-ignore tests/.env
 ## 🛡️ Security Measures in Place
 
 ### 1. Git Ignore Configuration
+
 **File**: `.gitignore`
 
 Protected patterns:
+
 ```
 # CRITICAL: Never commit API credentials!
 .env
@@ -65,6 +74,7 @@ Protected patterns:
 ```
 
 Also ignores:
+
 - Python cache files (`__pycache__/`, `*.pyc`)
 - Virtual environments (`venv/`, `.venv/`)
 - IDE files (`.vscode/`, `.idea/`)
@@ -72,35 +82,43 @@ Also ignores:
 - Home Assistant secrets (`secrets.yaml`)
 
 ### 2. Tests Directory Protection
+
 **File**: `tests/.gitignore`
 
 Additional protection:
+
 ```
 # NEVER commit actual credentials!
 .env
 ```
 
 ### 3. Security Documentation
-**Files**: 
+
+**Files**:
+
 - `.github/SECURITY.md` - Security policy and reporting
 - `.github/copilot-instructions.md` - Developer guidelines
 - `CONTRIBUTING.md` - Contribution guidelines
 
 All emphasize:
+
 - ❌ Never commit API credentials
 - ❌ Never log full credentials
 - ✅ Use environment variables for tests
 - ✅ Mask secrets in logs (first 8 chars only)
 
 ### 4. Code-Level Protection
+
 **Pattern**: All logging of credentials is masked
 
 Example from `custom_components/solarguardian/__init__.py`:
+
 ```python
 _LOGGER.info("🔧 App Key: %s...", api.app_key[:8] if len(api.app_key) > 8 else "***")
 ```
 
 **Pattern**: Configuration uses Home Assistant's secure storage
+
 ```python
 app_key=entry.data[CONF_APP_KEY],
 app_secret=entry.data[CONF_APP_SECRET],
@@ -120,6 +138,7 @@ Before every commit, verify:
 - [ ] No user-specific paths or data
 
 ### Quick Verification Command
+
 ```bash
 # Check staged files for potential secrets
 git diff --cached | grep -i "app_key\|app_secret\|password\|token" | grep -v "CONF_\|example"
@@ -130,7 +149,9 @@ git diff --cached | grep -i "app_key\|app_secret\|password\|token" | grep -v "CO
 ## 🔍 Security Scan Results
 
 ### Files Scanned: 219 files
+
 ### Issues Found: 1 (now resolved)
+
 ### Current Status: ✅ SECURE
 
 ### Scan Categories:
@@ -165,12 +186,14 @@ git diff --cached | grep -i "app_key\|app_secret\|password\|token" | grep -v "CO
 ## ⚠️ Important Notes for Users
 
 ### For Contributors
+
 1. **Never commit your `.env` file** - Create from `.env.example`
 2. **Always mask secrets in logs** - Use pattern: `secret[:8] + "..."`
 3. **Use environment variables for tests** - Never hardcode credentials
 4. **Check before commit** - Run security scan commands above
 
 ### For Repository Owners
+
 1. **Force Push Required** - Git history was rewritten
    ```bash
    git push --force origin master
@@ -179,7 +202,9 @@ git diff --cached | grep -i "app_key\|app_secret\|password\|token" | grep -v "CO
 3. **Monitor Repository** - Set up GitHub secret scanning alerts
 
 ### Credential Rotation Recommended
+
 Since a partial API key was exposed in public commits, even though now removed:
+
 1. Consider regenerating API credentials in SolarGuardian platform
 2. Update Home Assistant integration configuration
 3. Update local `tests/.env` if you recreate it
@@ -195,11 +220,13 @@ If you accidentally commit credentials:
    - Update all systems using old credentials
 
 2. **Remove from Git History**
+
    ```bash
    git-filter-repo --replace-text <(echo 'EXPOSED_SECRET==>[REDACTED]') --force
    ```
 
 3. **Force Push to Remote**
+
    ```bash
    git push --force origin master
    ```
@@ -216,21 +243,25 @@ If you accidentally commit credentials:
 ## 📊 Git History Stats
 
 ### Before Cleanup
+
 - Total commits: 25
 - Commits with exposed credentials: 6
 - Files with credentials: 1 (`docs/TEST_RESULTS_OCTOBER_1.md`)
 - Credential occurrences: 6
 
 ### After Cleanup
+
 - Total commits: 25 (rewritten)
 - Commits with exposed credentials: 0 ✅
 - Files with credentials: 0 ✅
 - Credential occurrences: 0 ✅
 
 ### Commit Hash Changes
+
 All commit hashes changed after git-filter-repo:
 
 **Latest commits** (new hashes):
+
 - `316984f` - security: Redact API credentials from test results documentation
 - `2992e04` - docs: Add repository cleanup summary
 - `7b35f70` - chore: Clean up repository structure
@@ -256,6 +287,7 @@ All commit hashes changed after git-filter-repo:
 ### Ready for Public Repository: **YES** ✅
 
 The repository is now safe to:
+
 - ✅ Push to GitHub public repository
 - ✅ Share publicly
 - ✅ Submit to HACS
@@ -264,6 +296,7 @@ The repository is now safe to:
 ### Required Action Before Push
 
 **IMPORTANT**: Must use `--force` push because git history was rewritten:
+
 ```bash
 git push --force origin master
 ```
@@ -279,6 +312,7 @@ This will overwrite the remote history with the cleaned version.
 **Reason**: Even though removed from history, a partial API key was briefly exposed in commits. Best practice is to regenerate credentials.
 
 **Steps to Rotate**:
+
 1. Log into SolarGuardian platform
 2. Navigate to: System Management → Personal Information Management → Open API
 3. Generate new `appKey` and `appSecret`
@@ -289,10 +323,11 @@ This will overwrite the remote history with the cleaned version.
 
 ## 📝 Audit Trail
 
-**Audit Performed By**: GitHub Copilot (automated security scan)  
-**Audit Date**: October 2, 2025  
-**Audit Scope**: Full repository (all files, all git history)  
-**Tools Used**: 
+**Audit Performed By**: GitHub Copilot (automated security scan)
+**Audit Date**: October 2, 2025
+**Audit Scope**: Full repository (all files, all git history)
+**Tools Used**:
+
 - `git grep` (history search)
 - `grep -r` (workspace search)
 - `git-filter-repo` (history rewrite)
@@ -313,6 +348,6 @@ If you discover a security vulnerability in this integration:
 
 ---
 
-**Last Updated**: October 2, 2025  
-**Next Audit**: Before any major release  
+**Last Updated**: October 2, 2025
+**Next Audit**: Before any major release
 **Status**: ✅ SECURE AND READY FOR PUBLIC RELEASE

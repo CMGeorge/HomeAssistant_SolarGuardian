@@ -5,6 +5,7 @@
 ### ✅ 1. Hassfest Workflow (`.github/workflows/hassfest.yaml`)
 
 **New separate workflow** for Home Assistant validation:
+
 ```yaml
 name: Validate with hassfest
 
@@ -12,7 +13,7 @@ on:
   push:
   pull_request:
   schedule:
-    - cron: "0 0 * * *"  # Daily validation
+    - cron: "0 0 * * *" # Daily validation
 
 jobs:
   validate:
@@ -23,6 +24,7 @@ jobs:
 ```
 
 **Why separate?**
+
 - HACS validation checks HACS-specific requirements
 - Hassfest validates Home Assistant manifest requirements
 - Industry standard to have both (see Sabiana integration)
@@ -31,6 +33,7 @@ jobs:
 ### ✅ 2. Updated Validate Workflow
 
 Removed hassfest from main validate.yaml to avoid duplication:
+
 - Now only does HACS validation
 - Cleaner separation of concerns
 - Faster individual workflow runs
@@ -38,6 +41,7 @@ Removed hassfest from main validate.yaml to avoid duplication:
 ### ✅ 3. README Badges
 
 Added professional validation badges:
+
 ```markdown
 [![Validate](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions/workflows/validate.yaml/badge.svg)](...)
 [![hassfest](https://github.com/CMGeorge/HomeAssistant_SolarGuardian/actions/workflows/hassfest.yaml/badge.svg)](...)
@@ -47,6 +51,7 @@ Added professional validation badges:
 ```
 
 **Badge Status** (after pushing):
+
 - 🟢 Validate - Shows HACS validation status
 - 🟢 Hassfest - Shows Home Assistant validation status
 - 🟠 HACS - Shows it's available as custom repository
@@ -56,11 +61,13 @@ Added professional validation badges:
 ### ✅ 4. "Open in HACS" Button
 
 Added the official HACS button:
+
 ```markdown
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=CMGeorge&repository=HomeAssistant_SolarGuardian&category=integration)
 ```
 
 **What it does**:
+
 - Clicking opens user's Home Assistant instance
 - Directly navigates to HACS
 - Auto-fills repository details
@@ -69,6 +76,7 @@ Added the official HACS button:
 ### ✅ 5. info.md (HACS UI Display)
 
 Created `info.md` for HACS interface:
+
 - Displayed when users view integration in HACS
 - User-friendly feature list with emojis
 - Installation instructions
@@ -77,6 +85,7 @@ Created `info.md` for HACS interface:
 - System requirements
 
 **Example from HACS UI**:
+
 ```
 ✅ Real-time Monitoring
 - Solar power output (W, kW)
@@ -87,6 +96,7 @@ Created `info.md` for HACS interface:
 ### ✅ 6. README Improvements
 
 Following Sabiana structure:
+
 - Professional badges at top
 - Clear section separators (`---`)
 - Better formatting with bold text
@@ -96,16 +106,16 @@ Following Sabiana structure:
 
 ## Comparison with Sabiana Integration
 
-| Feature | Sabiana | SolarGuardian | Status |
-|---------|---------|---------------|--------|
-| Validate workflow | ✅ | ✅ | Added |
-| Hassfest workflow | ✅ | ✅ | **Added** |
-| Lint workflow | ✅ | ✅ | Already had |
-| README badges | ✅ | ✅ | **Added** |
-| Open in HACS button | ✅ | ✅ | **Added** |
-| info.md | ✅ | ✅ | **Added** |
-| Test workflow | ✅ | ✅ | Already had |
-| Release workflow | ✅ | ✅ | Already had |
+| Feature             | Sabiana | SolarGuardian | Status      |
+| ------------------- | ------- | ------------- | ----------- |
+| Validate workflow   | ✅      | ✅            | Added       |
+| Hassfest workflow   | ✅      | ✅            | **Added**   |
+| Lint workflow       | ✅      | ✅            | Already had |
+| README badges       | ✅      | ✅            | **Added**   |
+| Open in HACS button | ✅      | ✅            | **Added**   |
+| info.md             | ✅      | ✅            | **Added**   |
+| Test workflow       | ✅      | ✅            | Already had |
+| Release workflow    | ✅      | ✅            | Already had |
 
 **Now matching!** ✅
 
@@ -114,6 +124,7 @@ Following Sabiana structure:
 Based on https://hacs.xyz/docs/publish/integration/:
 
 ### Required Elements
+
 - ✅ `hacs.json` in repository root
 - ✅ `manifest.json` with required fields
 - ✅ `README.md` with installation instructions
@@ -124,6 +135,7 @@ Based on https://hacs.xyz/docs/publish/integration/:
 - ✅ Home Assistant version specified
 
 ### Best Practices (from docs)
+
 - ✅ GitHub releases for versioning
 - ✅ Validation workflows (HACS + Hassfest)
 - ✅ Clear documentation
@@ -149,12 +161,14 @@ Based on https://hacs.xyz/docs/publish/integration/:
 ### User Experience
 
 **Before**:
+
 - Users see repository
 - No validation badges
 - No quick install button
 - Generic README
 
 **After**:
+
 - Users see validation badges (trust indicators)
 - Click "Open in HACS" for instant install
 - Professional README with clear structure
@@ -199,15 +213,16 @@ Added:
 
 ## Summary
 
-✅ **Hassfest workflow** - Daily Home Assistant validation  
-✅ **Validation badges** - Professional trust indicators  
-✅ **Open in HACS button** - One-click install experience  
-✅ **info.md** - User-friendly HACS UI  
-✅ **README improvements** - Clear structure and formatting  
+✅ **Hassfest workflow** - Daily Home Assistant validation
+✅ **Validation badges** - Professional trust indicators
+✅ **Open in HACS button** - One-click install experience
+✅ **info.md** - User-friendly HACS UI
+✅ **README improvements** - Clear structure and formatting
 
 **Result**: Matches Sabiana integration quality! 🎉
 
 Now your integration:
+
 - Validates automatically (HACS + HA)
 - Shows trust badges
 - Provides one-click install

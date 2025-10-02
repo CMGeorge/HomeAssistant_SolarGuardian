@@ -1,4 +1,5 @@
 """Support for SolarGuardian sensors."""
+
 from __future__ import annotations
 
 import logging
@@ -29,10 +30,19 @@ _LOGGER = logging.getLogger(__name__)
 
 # Sensors that should be marked as diagnostic (technical/debug info)
 DIAGNOSTIC_SENSORS = [
-    "SerialNumber", "DeviceSerialNumber", "GatewayID", "GatewaySN",
-    "FirmwareVersion", "HardwareVersion", "ProtocolVersion",
-    "RegisterAddress", "ModbusAddress", "DeviceAddress",
-    "CommunicationStatus", "SignalStrength", "DataQuality",
+    "SerialNumber",
+    "DeviceSerialNumber",
+    "GatewayID",
+    "GatewaySN",
+    "FirmwareVersion",
+    "HardwareVersion",
+    "ProtocolVersion",
+    "RegisterAddress",
+    "ModbusAddress",
+    "DeviceAddress",
+    "CommunicationStatus",
+    "SignalStrength",
+    "DataQuality",
 ]
 
 # Mapping of parameter identifiers to sensor configurations
@@ -339,6 +349,7 @@ async def async_setup_entry(
     # Check if we have data
     if not coordinator.data:
         _LOGGER.warning("No initial data available for sensor setup")
+
         # Set up a listener to create sensors when data becomes available
         async def _async_data_updated():
             if coordinator.data and coordinator.data.get("devices"):
@@ -375,13 +386,15 @@ async def _setup_sensors_from_data(
             "Data summary: %d stations, %d devices, %d sensors",
             summary.get("stations", 0),
             summary.get("devices", 0),
-            summary.get("sensors", 0)
+            summary.get("sensors", 0),
         )
 
     # Create sensors for each device
     for station_id, devices in coordinator.data.get("devices", {}).items():
         station_devices = devices.get("data", {}).get("list", [])
-        _LOGGER.debug("Processing %d devices from station %s", len(station_devices), station_id)
+        _LOGGER.debug(
+            "Processing %d devices from station %s", len(station_devices), station_id
+        )
 
         for device in station_devices:
             device_id = device["id"]
@@ -389,7 +402,9 @@ async def _setup_sensors_from_data(
             device_data = coordinator.data.get("device_data", {}).get(device_id, {})
 
             if not device_data:
-                _LOGGER.warning("No parameter data available for device %s", device_name)
+                _LOGGER.warning(
+                    "No parameter data available for device %s", device_name
+                )
                 continue
 
             # Initialize device sensor counter
@@ -401,9 +416,15 @@ async def _setup_sensors_from_data(
                 ("_device_serial", device.get("equipmentNo", "Unknown")),
                 ("_device_gateway", device.get("gatewayId", "Unknown")),
                 ("_device_gateway_name", device.get("gatewayName", "Unknown")),
-                ("_device_product", device.get("productName", device.get("productNameE", "Unknown"))),
+                (
+                    "_device_product",
+                    device.get("productName", device.get("productNameE", "Unknown")),
+                ),
                 ("_device_location", device.get("address", "Unknown")),
-                ("_device_status_text", "Online" if device.get("status") == 1 else "Offline"),
+                (
+                    "_device_status_text",
+                    "Online" if device.get("status") == 1 else "Offline",
+                ),
             ]
 
             for sensor_id, sensor_value in device_info_sensors:
@@ -421,7 +442,9 @@ async def _setup_sensors_from_data(
 
             # Create sensors for each parameter group
             for group in device_data.get("data", {}).get("variableGroupList", []):
-                group_name = group.get("variableGroupNameE", group.get("variableGroupNameC", "Unknown"))
+                group_name = group.get(
+                    "variableGroupNameE", group.get("variableGroupNameC", "Unknown")
+                )
                 for variable in group.get("variableList", []):
                     data_identifier = variable.get("dataIdentifier")
                     if not data_identifier:
@@ -435,7 +458,7 @@ async def _setup_sensors_from_data(
                     if variable_mode == "1":
                         _LOGGER.debug(
                             "Skipping configuration parameter: %s (mode=1, not readable via API)",
-                            variable.get("variableNameE", data_identifier)
+                            variable.get("variableNameE", data_identifier),
                         )
                         continue
 
@@ -453,7 +476,8 @@ async def _setup_sensors_from_data(
                         # Create generic sensor for unknown parameters
                         _LOGGER.debug(
                             "Creating generic sensor for unknown parameter: %s in group %s",
-                            data_identifier, group_name
+                            data_identifier,
+                            group_name,
                         )
                         entities.append(
                             SolarGuardianSensor(
@@ -461,7 +485,10 @@ async def _setup_sensors_from_data(
                                 device,
                                 variable,
                                 {
-                                    "name": variable.get("variableNameE", variable.get("variableNameC", data_identifier)),
+                                    "name": variable.get(
+                                        "variableNameE",
+                                        variable.get("variableNameC", data_identifier),
+                                    ),
                                     "unit": variable.get("unit"),
                                     "icon": "mdi:gauge",
                                 },
@@ -469,7 +496,9 @@ async def _setup_sensors_from_data(
                         )
                         device_sensors += 1
 
-            _LOGGER.info("Created %d sensors for device %s", device_sensors, device_name)
+            _LOGGER.info(
+                "Created %d sensors for device %s", device_sensors, device_name
+            )
 
     _LOGGER.info("Total sensors created: %d", len(entities))
     if entities:
@@ -546,7 +575,9 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         device_data = self.coordinator.data.get("device_data", {}).get(device_id, {})
 
         if not device_data:
-            _LOGGER.debug("No device data available for %s (ID: %s)", device_name, device_id)
+            _LOGGER.debug(
+                "No device data available for %s (ID: %s)", device_name, device_id
+            )
             return None
 
         data_identifier = self._variable["dataIdentifier"]
@@ -567,38 +598,47 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                         translation_child = self._variable.get("translationChild", [])
                         if translation_child:
                             # Value needs to be translated (e.g., 0 -> "Not Charging")
-                            translated_value = self._translate_value(value, translation_child)
+                            translated_value = self._translate_value(
+                                value, translation_child
+                            )
                             if translated_value is not None:
                                 _LOGGER.debug(
                                     "Sensor %s (%s) got translated value from latest_data: %s -> %s",
-                                    self.name, data_identifier, value, translated_value
+                                    self.name,
+                                    data_identifier,
+                                    value,
+                                    translated_value,
                                 )
-                                if hasattr(self, '_last_valid_value'):
+                                if hasattr(self, "_last_valid_value"):
                                     self._last_valid_value = translated_value
-                                if hasattr(self, '_value_source'):
+                                if hasattr(self, "_value_source"):
                                     self._value_source = "latest_data (translated)"
                                 return translated_value
 
                         _LOGGER.debug(
                             "Sensor %s (%s) got value from latest_data: %s",
-                            self.name, data_identifier, value
+                            self.name,
+                            data_identifier,
+                            value,
                         )
-                        if hasattr(self, '_last_valid_value'):
+                        if hasattr(self, "_last_valid_value"):
                             self._last_valid_value = value
-                        if hasattr(self, '_value_source'):
+                        if hasattr(self, "_value_source"):
                             self._value_source = "latest_data"
                         return value
                     except (ValueError, TypeError) as err:
                         _LOGGER.warning(
                             "Failed to convert value for %s: %s (error: %s)",
-                            data_identifier, data_point.get("value"), err
+                            data_identifier,
+                            data_point.get("value"),
+                            err,
                         )
                         return data_point.get("value")
         else:
             _LOGGER.debug(
                 "No latest_data available for %s - latest_data status: %s",
                 device_name,
-                "present but empty" if "latest_data" in device_data else "not present"
+                "present but empty" if "latest_data" in device_data else "not present",
             )
 
         # Fallback to checking variable configuration data
@@ -616,11 +656,14 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                                     value = value / (10 ** int(decimal))
                                 _LOGGER.debug(
                                     "Sensor %s (%s) got value from variable.%s: %s",
-                                    self.name, data_identifier, value_field, value
+                                    self.name,
+                                    data_identifier,
+                                    value_field,
+                                    value,
                                 )
-                                if hasattr(self, '_last_valid_value'):
+                                if hasattr(self, "_last_valid_value"):
                                     self._last_valid_value = value
-                                if hasattr(self, '_value_source'):
+                                if hasattr(self, "_value_source"):
                                     self._value_source = f"variable.{value_field}"
                                 return value
                             except (ValueError, TypeError):
@@ -629,21 +672,26 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
 
         # Log when we can't find any value
         # Check if attribute exists (backward compatibility with existing sensors)
-        if hasattr(self, '_last_valid_value') and self._last_valid_value is not None:
+        if hasattr(self, "_last_valid_value") and self._last_valid_value is not None:
             # Return last known value if we have one
             _LOGGER.debug(
                 "No current value for sensor %s (%s) in device %s - using last known value: %s",
-                self.name, data_identifier, device_name, self._last_valid_value
+                self.name,
+                data_identifier,
+                device_name,
+                self._last_valid_value,
             )
-            if hasattr(self, '_value_source'):
+            if hasattr(self, "_value_source"):
                 self._value_source = "last_known (stale)"
             return self._last_valid_value
 
         _LOGGER.debug(
             "No value found for sensor %s (%s) in device %s - parameter not in latest_data",
-            self.name, data_identifier, device_name
+            self.name,
+            data_identifier,
+            device_name,
         )
-        if hasattr(self, '_value_source'):
+        if hasattr(self, "_value_source"):
             self._value_source = "none"
         return None
 
@@ -657,7 +705,9 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         # If we have data, check if our specific device data is available
         if self.coordinator.data:
             device_id = self._device["id"]
-            device_data = self.coordinator.data.get("device_data", {}).get(device_id, {})
+            device_data = self.coordinator.data.get("device_data", {}).get(
+                device_id, {}
+            )
             # Entity is available if we have device data, even if latest update failed
             return bool(device_data)
 
@@ -679,7 +729,7 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         attrs = {
             "data_identifier": self._variable.get("dataIdentifier"),
             "variable_name": self._variable.get("variableName"),
-            "data_source": getattr(self, '_value_source', None) or "none",
+            "data_source": getattr(self, "_value_source", None) or "none",
         }
 
         # Add parameter info for diagnostic purposes

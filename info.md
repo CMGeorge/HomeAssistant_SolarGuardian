@@ -5,6 +5,7 @@ Monitor your Epever Solar inverters through the SolarGuardian cloud API!
 ## Features
 
 ✅ **Real-time Monitoring**
+
 - Solar power output (W, kW)
 - Battery voltage, current, capacity (%)
 - AC/DC voltage and current
@@ -12,17 +13,20 @@ Monitor your Epever Solar inverters through the SolarGuardian cloud API!
 - Energy production (daily, total)
 
 ✅ **Device Status**
+
 - Online/offline status
 - Alarm monitoring
 - Equipment health indicators
 - Bitmask status register (for advanced users)
 
 ✅ **Multiple Devices**
+
 - Supports multiple power stations
 - Multiple devices per station
 - Automatic device discovery
 
 ✅ **Cloud API**
+
 - No local network access needed
 - Works from anywhere
 - API rate limiting respected
@@ -61,6 +65,7 @@ The integration automatically creates sensors for:
 - **And many more...**
 
 All sensors show proper units (W, V, A, °C, kWh, %) and include:
+
 - ✅ Device class (for proper icons)
 - ✅ State class (for statistics/energy dashboard)
 - ✅ Proper translations (English, German, Hungarian, Romanian)
@@ -68,6 +73,7 @@ All sensors show proper units (W, V, A, °C, kWh, %) and include:
 ## Rate Limits
 
 The integration respects API rate limits:
+
 - **Authentication**: 10 calls/minute
 - **Data requests**: 30 calls/minute
 - Automatic retry with backoff on errors

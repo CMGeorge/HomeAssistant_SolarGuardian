@@ -2,11 +2,11 @@ name: CodeQL Security Analysis
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: ["master", "main"]
   pull_request:
-    branches: [ "master", "main" ]
+    branches: ["master", "main"]
   schedule:
-    - cron: '0 0 * * 1'  # Weekly on Monday at midnight
+    - cron: "0 0 * * 1" # Weekly on Monday at midnight
 
 jobs:
   analyze:

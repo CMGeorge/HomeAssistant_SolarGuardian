@@ -12,10 +12,12 @@ File: /config/custom_components/solarguardian/sensor.py:572
 ## Root Cause
 
 The previous commit (`698b178`) added new attributes to the `SolarGuardianSensor.__init__()` method:
+
 - `self._last_valid_value = None`
 - `self._value_source = None`
 
 However, **existing sensor entities** created before this update don't have these attributes because:
+
 1. Home Assistant preserves entity state across restarts
 2. Existing entities don't re-run `__init__()` after code update
 3. Code tried to access attributes that don't exist on old entities
@@ -25,6 +27,7 @@ However, **existing sensor entities** created before this update don't have thes
 Added `hasattr()` checks before accessing new attributes:
 
 ### Before (Breaking):
+
 ```python
 if self._last_valid_value is not None:  # ❌ Crashes if attribute doesn't exist
     return self._last_valid_value
@@ -33,6 +36,7 @@ self._value_source = "none"  # ❌ Crashes if attribute doesn't exist
 ```
 
 ### After (Safe):
+
 ```python
 if hasattr(self, '_last_valid_value') and self._last_valid_value is not None:  # ✅ Safe
     return self._last_valid_value
@@ -42,23 +46,26 @@ if hasattr(self, '_value_source'):  # ✅ Safe
 ```
 
 ### In Attributes:
+
 ```python
 # Before
 "data_source": self._value_source or "none",  # ❌ Crashes
 
-# After  
+# After
 "data_source": getattr(self, '_value_source', None) or "none",  # ✅ Safe
 ```
 
 ## Impact
 
 ### Before Fix:
+
 - ❌ 79 sensor errors on startup
 - ❌ Integration partially broken
 - ❌ Coordinator updates fail
 - ❌ Users see errors in logs
 
 ### After Fix:
+
 - ✅ All sensors load successfully
 - ✅ No errors in logs
 - ✅ Existing sensors work (limited features)
@@ -68,12 +75,14 @@ if hasattr(self, '_value_source'):  # ✅ Safe
 ## Migration Behavior
 
 ### Existing Sensors (Before Restart)
+
 - Work without errors ✅
 - Don't have `_last_valid_value` storage
 - Don't have `data_source` in attributes
 - Values update normally from latest_data
 
 ### After Full Restart
+
 - All sensors recreated with new attributes ✅
 - Full feature set available
 - `_last_valid_value` tracking active
@@ -82,6 +91,7 @@ if hasattr(self, '_value_source'):  # ✅ Safe
 ## User Actions
 
 ### Immediate (Required)
+
 1. **Update integration from HACS** to get commit `73bef59`
 2. **Restart Home Assistant** (full restart)
 
@@ -90,6 +100,7 @@ That's it! No need to remove/re-add integration.
 ### Expected Behavior After Update
 
 **Logs should show:**
+
 ```
 ✅ Setting up sensors with data status: success
 ✅ Update complete: 1 stations, 1 devices, 79 sensors, 0 errors
@@ -97,6 +108,7 @@ That's it! No need to remove/re-add integration.
 ```
 
 **No errors about:**
+
 ```
 ❌ AttributeError: 'SolarGuardianSensor' object has no attribute '_last_valid_value'
 ```
@@ -121,7 +133,7 @@ Always use defensive programming for new attributes:
 if self._new_attribute is not None:
     do_something()
 
-# ✅ Do this (safe for existing entities)  
+# ✅ Do this (safe for existing entities)
 if hasattr(self, '_new_attribute') and self._new_attribute is not None:
     do_something()
 
@@ -132,6 +144,7 @@ value = getattr(self, '_new_attribute', default_value)
 ### When Entities Get Recreated
 
 Entities get new `__init__()` call when:
+
 - Integration removed and re-added
 - Home Assistant full restart (sometimes)
 - Entity explicitly deleted and re-discovered
@@ -140,12 +153,14 @@ Entities get new `__init__()` call when:
 ## Commits Summary
 
 ### Commit 698b178 (Original Feature)
+
 - ✅ Added `_last_valid_value` storage
 - ✅ Added `_value_source` tracking
 - ✅ Enhanced sensor attributes
 - ❌ Broke existing sensors (missing hasattr checks)
 
 ### Commit 73bef59 (Compatibility Fix)
+
 - ✅ Added `hasattr()` checks
 - ✅ Used `getattr()` with defaults
 - ✅ Backward compatible with old entities
@@ -172,8 +187,8 @@ After updating to `73bef59`:
 
 ---
 
-**Issue:** AttributeError on existing sensors  
-**Fix Commit:** 73bef59  
-**Status:** Resolved  
-**User Action:** Update from HACS + Restart  
+**Issue:** AttributeError on existing sensors
+**Fix Commit:** 73bef59
+**Status:** Resolved
+**User Action:** Update from HACS + Restart
 **Date:** October 1, 2025

@@ -5,6 +5,7 @@
 ---
 
 ## ✅ Fix #1: Sensors Showing "Unknown"
+
 **Severity**: CRITICAL | **Commit**: `b77ad81`
 
 **Problem**: All 79 sensors showed "Unknown" despite API returning 43 values
@@ -17,10 +18,12 @@
 
 ---
 
-## ✅ Fix #2: Wrong Decimal Places  
+## ✅ Fix #2: Wrong Decimal Places
+
 **Severity**: HIGH | **Commit**: `2513190` (part 1)
 
-**Problem**: 
+**Problem**:
+
 - AC Voltage: 2.1993 V (should be 219.93 V)
 - Frequency: 0.5 Hz (should be 50.0 Hz)
 
@@ -33,11 +36,13 @@
 ---
 
 ## ✅ Fix #3: Enum Sensors Showing Numbers
+
 **Severity**: MEDIUM | **Commit**: `2513190` (part 2)
 
 **Problem**:
+
 - PV Charging Status: 0.0 (should be "Not Charging")
-- Battery Alarm: 0.0 (should be "Normal")  
+- Battery Alarm: 0.0 (should be "Normal")
 - Load Status: 0.0 (should be "Light Load")
 
 **Root Cause**: Not using API's `translationChild` enum mappings
@@ -49,6 +54,7 @@
 ---
 
 ## ✅ Fix #4: Enum Sensors Crashing HA
+
 **Severity**: CRITICAL | **Commit**: `074e9a6`
 
 **Problem**: ValueError - "could not convert string to float: 'Not Charging'"
@@ -61,7 +67,8 @@
 
 ---
 
-## ✅ Fix #5: Configuration Parameters Showing "Unknown"  
+## ✅ Fix #5: Configuration Parameters Showing "Unknown"
+
 **Severity**: MEDIUM | **Commit**: `d3d1532`
 
 **Problem**: 44 sensors always showing "Unknown" (Battery Type, Voltages, etc.)
@@ -79,7 +86,7 @@
 **43 out of 43 sensors working (100%)** 🎉
 
 - ✅ 43 real-time sensors (power, voltage, temperature, SOC, energy)
-- ✅ 22 of those are enum/status sensors (charging status, alarms, modes)  
+- ✅ 22 of those are enum/status sensors (charging status, alarms, modes)
 - ✅ 6 device info text sensors (Gateway ID, Product Name, Location)
 - ✨ **0 sensors showing "Unknown"**
 - ℹ️ 44 control parameters excluded (for future control platform)
@@ -89,8 +96,9 @@
 ## 🧪 Testing
 
 All fixes verified with **REAL API CALLS**:
+
 - `tests/run_real_api_tests.py` - API structure verification
-- `tests/test_translations.py` - Enum translation verification  
+- `tests/test_translations.py` - Enum translation verification
 - `tests/analyze_modes.py` - mode="0" vs mode="1" analysis
 
 ---
@@ -99,7 +107,7 @@ All fixes verified with **REAL API CALLS**:
 
 1. **HACS** → **Integrations** → **SolarGuardian** → **Redownload**
 2. **Settings** → **System** → **Restart Home Assistant** (full restart required!)
-3. **Verify**: 
+3. **Verify**:
    - 43 sensors with real values
    - Correct decimal places
    - Enum sensors showing text
@@ -110,6 +118,7 @@ All fixes verified with **REAL API CALLS**:
 ## 📝 Documentation
 
 ### Bug Fixes
+
 - `CRITICAL_BUG_FIX_SENSORS.md` - dataPointId fix
 - `BUGFIX_DECIMAL_FORMATTING.md` - Decimal fix
 - `BUGFIX_ENUM_TRANSLATIONS.md` - Translation feature
@@ -117,6 +126,7 @@ All fixes verified with **REAL API CALLS**:
 - `SOLUTION_UNKNOWN_SENSORS.md` - Configuration parameters explanation
 
 ### Future Enhancement
+
 - `CONTROL_PLATFORM_GUIDE.md` - How to implement controls for mode="1" parameters
 
 ---
@@ -124,6 +134,7 @@ All fixes verified with **REAL API CALLS**:
 ## 💡 About Configuration Parameters (mode="1")
 
 The 44 excluded parameters are **writable controls**, not readable sensors:
+
 - Battery Type, Charging Voltages, Current Limits
 - Operating Modes, Switches, Temperature Settings
 - API supports **writing** these via command endpoint
@@ -134,6 +145,6 @@ See `CONTROL_PLATFORM_GUIDE.md` for implementation details.
 
 ---
 
-✅ **All sensor fixes tested, documented, and committed**  
-🎉 **Integration fully functional with 43 working sensors!**  
+✅ **All sensor fixes tested, documented, and committed**
+🎉 **Integration fully functional with 43 working sensors!**
 📋 **Control platform awaiting user decision**

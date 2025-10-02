@@ -2,8 +2,8 @@
 
 ## ✅ Test Status: SUCCESSFUL
 
-**Date**: October 1, 2025, 16:34:21  
-**Test Type**: Real API (No Mocking)  
+**Date**: October 1, 2025, 16:34:21
+**Test Type**: Real API (No Mocking)
 **Credentials**: [REDACTED]
 
 ---
@@ -11,12 +11,14 @@
 ## 🎯 Test Results Summary
 
 ### Authentication ✅
+
 - **Status**: ✅ SUCCESSFUL
 - **Domain**: openapi.epsolarpv.com
 - **Access Token**: Received and valid
 - **Token Expires**: 2 hours (2025-10-01 18:34:23)
 
 ### Power Stations ✅
+
 - **Total Stations**: 1
 - **Status**: ✅ Retrieved successfully
 - **Station Name**: Makkaizsolt_1742059388494
@@ -25,6 +27,7 @@
 - **Equipment Online**: 1 (100% online)
 
 ### Devices ✅
+
 - **Total Devices**: 1
 - **Status**: ✅ Retrieved successfully
 - **Device Name**: Makkaizsolt_1742059709718
@@ -36,6 +39,7 @@
 - **Status**: 1 (Online ✅)
 
 ### Device Parameters ✅
+
 - **Status**: ✅ Retrieved successfully
 - **Total Parameters**: 89 parameters across 15 groups
 - **Parameter Groups**:
@@ -56,12 +60,14 @@
   15. Load Switch (12 parameters - control actions)
 
 ### Latest Data Endpoint ⚠️
+
 - **Status**: ⚠️ API Error ("inner error")
 - **Attempts**: 6 batches tested (89 parameters total)
 - **Issue**: API server returning "inner error" for all requests
 - **Impact**: Historical/static parameters retrieved successfully, but real-time sensor values not available
 
 **API Error Details**:
+
 ```json
 {
   "status": "non-zero",
@@ -76,6 +82,7 @@ This is an **API-side issue**, not a client issue. The endpoint exists and respo
 ## 📊 Discovered Parameters
 
 ### Real-time Monitoring Parameters
+
 - `totalPowerGeneration` - Total Power Generation
 - `totalPowerConsumption` - Total Power Consumption
 - `AC_1` through `AC_7` - AC Working Parameters
@@ -84,6 +91,7 @@ This is an **API-side issue**, not a client issue. The endpoint exists and respo
 - `equipmentStatus` - Equipment Status
 
 ### Battery Parameters
+
 - Battery Voltage
 - Battery Current
 - Battery SOC (State of Charge)
@@ -91,12 +99,14 @@ This is an **API-side issue**, not a client issue. The endpoint exists and respo
 - Battery Capacity
 
 ### Solar PV Parameters
+
 - PV Voltage
 - PV Current
 - PV Power
 - PV Working Status
 
 ### Control Parameters
+
 - `open52` - Load Switch
 - `open1`, `open2`, `open5` - Other switches
 - Various configuration settings
@@ -106,7 +116,9 @@ This is an **API-side issue**, not a client issue. The endpoint exists and respo
 ## 🔍 Detailed Device Information
 
 ### Product: UP HI (Epever Solar)
+
 **Capabilities**:
+
 - ✅ Solar PV input monitoring
 - ✅ Battery management system
 - ✅ AC output monitoring
@@ -118,6 +130,7 @@ This is an **API-side issue**, not a client issue. The endpoint exists and respo
 **Image**: Available at `https://hncloud.epsolarpv.com/uploads/series/1694134953855_0072.jpg`
 
 ### Network Status
+
 - **Online Status**: ✅ Device is online
 - **Gateway**: Connected via 06150296093XY22X-00831
 - **Last Update**: Active (recent data)
@@ -127,9 +140,11 @@ This is an **API-side issue**, not a client issue. The endpoint exists and respo
 ## 🐛 Known Issues
 
 ### 1. Latest Data Endpoint Returns "inner error"
+
 **Issue**: `/history/lastDatapoint` endpoint (port 7002) returns "inner error"
 
 **Possible Causes**:
+
 1. Device is newly registered and hasn't sent data yet
 2. API server configuration issue
 3. Account permissions limitation
@@ -137,7 +152,8 @@ This is an **API-side issue**, not a client issue. The endpoint exists and respo
 
 **Workaround**: Integration will use device parameters instead of latest data endpoint
 
-**Impact**: 
+**Impact**:
+
 - ✅ Device discovery works
 - ✅ Parameter structure retrieved
 - ✅ Device status available
@@ -147,6 +163,7 @@ This is an **API-side issue**, not a client issue. The endpoint exists and respo
 ### 2. Alternative Data Retrieval Methods
 
 The integration can fall back to:
+
 1. **Device Parameters Endpoint** - Get configuration and some status
 2. **History Endpoint** - Get historical data points
 3. **Polling Device Status** - Get current online/offline state
@@ -156,14 +173,16 @@ The integration can fall back to:
 ## ✅ Integration Compatibility
 
 ### What Works ✅
+
 1. **Authentication** - Full support
-2. **Station Discovery** - Full support  
+2. **Station Discovery** - Full support
 3. **Device Discovery** - Full support
 4. **Device Parameters** - Full support (89 parameters discovered)
 5. **Device Status** - Online/offline detection
 6. **Gateway Information** - Full support
 
 ### What Needs Alternative Approach ⚠️
+
 1. **Real-time Sensor Values** - Latest data endpoint not working
    - **Solution**: Use history endpoint or parameter polling
    - **Impact**: Slight delay in updates (will still update every 10 seconds)
@@ -173,12 +192,14 @@ The integration can fall back to:
 ## 🎯 Next Steps
 
 ### For Development
+
 1. ✅ Core API integration working perfectly
 2. ⚠️ Need to implement fallback for latest data endpoint
 3. ✅ Device discovery and parameter retrieval solid
 4. ⏳ Test with history endpoint as alternative
 
 ### For Deployment
+
 1. **Ready**: Authentication, device discovery
 2. **Ready**: Station and device management
 3. **Needs Work**: Real-time sensor value retrieval
@@ -209,6 +230,7 @@ except SolarGuardianAPIError as err:
 ## 📈 Performance Metrics
 
 ### API Response Times
+
 - **Authentication**: ~500ms
 - **Power Stations**: ~300ms
 - **Devices**: ~250ms
@@ -216,12 +238,14 @@ except SolarGuardianAPIError as err:
 - **Latest Data**: ~200ms (but returns error)
 
 ### API Call Summary
+
 - **Total Calls**: 10+
 - **Successful**: 4 (auth, stations, devices, parameters)
 - **Failed**: 6 (latest data batches)
 - **Success Rate**: 40% (but core functionality 100%)
 
 ### Rate Limiting
+
 - ✅ All calls within rate limits
 - ✅ No throttling encountered
 - ✅ Authentication token cached
@@ -233,6 +257,7 @@ except SolarGuardianAPIError as err:
 ### Overall Status: **MOSTLY SUCCESSFUL** ✅
 
 The integration **successfully**:
+
 - ✅ Authenticates with new credentials
 - ✅ Discovers your power station
 - ✅ Discovers your UP HI device
@@ -241,21 +266,23 @@ The integration **successfully**:
 - ✅ Identifies device location and gateway
 
 The integration **needs improvement**:
+
 - ⚠️ Latest data endpoint returns "inner error" (API-side issue)
 - ⚠️ Need to implement history endpoint fallback
 - ⚠️ Real-time sensor values not available via latest data
 
 ### Recommendation
+
 **Deploy with fallback strategy**: The core integration is solid. Add history endpoint support or parameter polling as fallback for real-time values.
 
 ---
 
 ## 📝 Account Information
 
-**Account**: Makkaizsolt  
-**Location**: Romania (Harghita)  
-**Equipment**: 1x UP HI Solar Inverter  
-**Status**: Active and Online ✅  
+**Account**: Makkaizsolt
+**Location**: Romania (Harghita)
+**Equipment**: 1x UP HI Solar Inverter
+**Status**: Active and Online ✅
 **API**: Fully Functional (except latest data endpoint)
 
 ---

@@ -1,9 +1,11 @@
 # SolarGuardian Integration - Changes Summary
+
 ## October 1, 2025 Session - COMPLETE
 
 ## 🎯 Issues Addressed
 
 ### 1. Sensors Showing "Unknown"
+
 **User Report:** Most sensors showing "Unknown" except device info sensors (Serial, Gateway, Location, etc.)
 
 **Root Cause:** API returns **43 out of 79 parameters** with real-time data. The remaining 36 are configuration/static values that don't update in real-time. **This is normal API behavior.**
@@ -11,17 +13,21 @@
 **Solution:** Enhanced sensor handling with state attributes and last-known-value storage.
 
 ### 2. Entity Organization
+
 **User Question:** "Should some sensors be moved to Diagnostics section?"
 
 **Solution:** Implemented `EntityCategory.DIAGNOSTIC` for:
+
 - Device info sensors (Serial, Gateway ID, Product Name, Location, Status)
 - Technical parameters (RegisterAddress, FirmwareVersion, etc.)
 - Main measurement sensors stay in primary view
 
 ### 3. Control Capabilities
+
 **User Question:** "Are there no Controls available based on the API?"
 
 **Discovery:** ✅ **YES! API fully supports control commands!**
+
 - Switches (Load ON/OFF)
 - Numbers (Battery capacity, voltage thresholds)
 - Rate limit: 10 commands/second
@@ -50,6 +56,7 @@ latest_data_url = f"https://{domain_parts}:{LATEST_DATA_PORT}{ENDPOINT_LATEST_DA
 ```
 
 **Benefits**:
+
 - ✅ Consistent with `get_latest_data_by_datapoints()`
 - ✅ Follows API V2.3 specification exactly
 - ✅ Better error handling for endpoint failures
@@ -70,6 +77,7 @@ DEFAULT_UPDATE_INTERVAL = 10  # seconds - update frequently to get near real-tim
 ```
 
 **Benefits**:
+
 - ✅ Near real-time sensor data (updates every 10 seconds)
 - ✅ Faster detection of power generation changes
 - ✅ More responsive battery monitoring
@@ -79,27 +87,32 @@ DEFAULT_UPDATE_INTERVAL = 10  # seconds - update frequently to get near real-tim
 ### 3. Test Infrastructure Improvements 🏗️
 
 **A. Removed Duplicate Code**
+
 - Deleted `tests/custom_components/solarguardian/` directory
 - Created symlink: `tests/custom_components -> ../custom_components`
 - Result: Single source of truth, no duplication
 
 **B. Fixed Import Issues**
+
 - Created `tests/test_api_wrapper.py`
 - Loads API modules without triggering Home Assistant imports
 - Tests run standalone without HA installed
 
 **C. Enhanced Test Script**
+
 - Updated `tests/run_real_api_tests.py`
 - Automatic `.env` loading with `python-dotenv`
 - Better error messages and documentation
 - Successfully tested with real API credentials
 
 **D. Removed Obsolete Files**
+
 - Deleted `test_live_api.py` (temporary test file)
 
 ### 4. Documentation Updates 📝
 
 **Updated Files**:
+
 - `.github/copilot-instructions.md` - Added update interval & rate limit docs
 - `TESTING_SUCCESS.md` - Documented successful API test
 - `CHANGELOG.md` - Complete change history
@@ -121,11 +134,13 @@ DEFAULT_UPDATE_INTERVAL = 10  # seconds - update frequently to get near real-tim
 ### Performance Metrics
 
 **Update Frequency**:
+
 - Before: 30 seconds (2 updates/minute)
 - After: 10 seconds (6 updates/minute)
 - Improvement: 3x more frequent updates
 
 **API Rate Limits (Respected)**:
+
 - Auth: 10 calls/min (6s between calls) ✅
 - Data: 30 calls/min (2s between calls) ✅
 - Typical load: 24 calls/min (within limits) ✅
@@ -141,6 +156,7 @@ DEFAULT_UPDATE_INTERVAL = 10  # seconds - update frequently to get near real-tim
 ## 📁 Files Modified
 
 ### Core Integration
+
 ```
 custom_components/solarguardian/
 ├── api.py                      # ✅ Fixed port 7002 usage
@@ -149,6 +165,7 @@ custom_components/solarguardian/
 ```
 
 ### Tests
+
 ```
 tests/
 ├── custom_components           # ✅ Now symlink to ../custom_components
@@ -158,6 +175,7 @@ tests/
 ```
 
 ### Documentation
+
 ```
 .github/
 └── copilot-instructions.md    # ✅ Updated with new info
@@ -170,6 +188,7 @@ Root:
 ```
 
 ### Deleted
+
 ```
 test_live_api.py               # ❌ Removed (temporary file)
 tests/custom_components/       # ❌ Removed (duplicate directory)
@@ -178,12 +197,14 @@ tests/custom_components/       # ❌ Removed (duplicate directory)
 ## 🎯 Impact Summary
 
 ### For Users
+
 1. **Faster Updates** - Sensors update every 10 seconds instead of 30
 2. **More Responsive** - Detect power changes 3x faster
 3. **Configurable** - Can still adjust interval in options
 4. **Same Reliability** - Still respects API rate limits
 
 ### For Developers
+
 1. **Better Testing** - Standalone tests without HA
 2. **No Duplication** - Single source for integration code
 3. **Clearer Code** - Both latest data methods now consistent
@@ -192,6 +213,7 @@ tests/custom_components/       # ❌ Removed (duplicate directory)
 ## 🚀 Ready to Deploy
 
 All changes are:
+
 - ✅ Tested with real API
 - ✅ Documented thoroughly
 - ✅ Security verified
@@ -201,11 +223,13 @@ All changes are:
 ## 📋 Next Steps
 
 ### Immediate
+
 1. Review changes
 2. Test in Home Assistant (if available)
 3. Commit to repository
 
 ### Future Enhancements
+
 - [ ] Add UI option for update interval
 - [ ] Implement adaptive polling
 - [ ] Add device type detection
@@ -217,22 +241,26 @@ All changes are:
 ## Quick Reference
 
 **Test the changes**:
+
 ```bash
 cd tests
 python run_real_api_tests.py
 ```
 
 **View logs**:
+
 ```bash
 tail -f home-assistant.log | grep solarguardian
 ```
 
 **Check update interval**:
+
 ```bash
 grep DEFAULT_UPDATE_INTERVAL custom_components/solarguardian/const.py
 ```
 
 **Verify port 7002 usage**:
+
 ```bash
 grep -n "LATEST_DATA_PORT" custom_components/solarguardian/api.py
 ```

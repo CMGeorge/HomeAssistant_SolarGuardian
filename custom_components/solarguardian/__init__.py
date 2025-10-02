@@ -1,4 +1,5 @@
 """The SolarGuardian integration."""
+
 from __future__ import annotations
 
 import asyncio
@@ -30,9 +31,11 @@ SERVICE_TEST_CONNECTION = "test_connection"
 SERVICE_GET_DIAGNOSTICS = "get_diagnostics"
 SERVICE_RESET_LATEST_DATA = "reset_latest_data"
 
-SERVICE_TEST_CONNECTION_SCHEMA = vol.Schema({
-    vol.Optional("verbose", default=False): cv.boolean,
-})
+SERVICE_TEST_CONNECTION_SCHEMA = vol.Schema(
+    {
+        vol.Optional("verbose", default=False): cv.boolean,
+    }
+)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -93,7 +96,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await _reset_latest_data_service(hass, entry.entry_id)
 
     hass.services.async_register(
-        DOMAIN, SERVICE_TEST_CONNECTION, test_connection_service, SERVICE_TEST_CONNECTION_SCHEMA
+        DOMAIN,
+        SERVICE_TEST_CONNECTION,
+        test_connection_service,
+        SERVICE_TEST_CONNECTION_SCHEMA,
     )
     hass.services.async_register(
         DOMAIN, SERVICE_GET_DIAGNOSTICS, get_diagnostics_service
@@ -105,7 +111,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def _test_connection_service(hass: HomeAssistant, entry_id: str, verbose: bool) -> None:
+async def _test_connection_service(
+    hass: HomeAssistant, entry_id: str, verbose: bool
+) -> None:
     """Test API connection and log results."""
     if entry_id not in hass.data[DOMAIN]:
         _LOGGER.error("SolarGuardian integration not found")
@@ -115,7 +123,9 @@ async def _test_connection_service(hass: HomeAssistant, entry_id: str, verbose: 
 
     _LOGGER.info("🚀 Starting SolarGuardian API connection test")
     _LOGGER.info("🔧 Domain: %s", api.domain)
-    _LOGGER.info("🔧 App Key: %s...", api.app_key[:8] if len(api.app_key) > 8 else "***")
+    _LOGGER.info(
+        "🔧 App Key: %s...", api.app_key[:8] if len(api.app_key) > 8 else "***"
+    )
 
     try:
         # Test authentication
@@ -158,11 +168,15 @@ async def _test_connection_service(hass: HomeAssistant, entry_id: str, verbose: 
 
                 _LOGGER.info("📊 Testing device parameters for: %s", device_name)
                 device_data = await api.get_device_parameters(device_id)
-                variable_groups = device_data.get("data", {}).get("variableGroupList", [])
+                variable_groups = device_data.get("data", {}).get(
+                    "variableGroupList", []
+                )
                 _LOGGER.info("✅ Found %d parameter groups", len(variable_groups))
 
                 # Count parameters
-                total_params = sum(len(group.get("variableList", [])) for group in variable_groups)
+                total_params = sum(
+                    len(group.get("variableList", [])) for group in variable_groups
+                )
                 _LOGGER.info("📈 Total parameters: %d", total_params)
 
         _LOGGER.info("🎉 Connection test completed successfully")
@@ -179,18 +193,27 @@ async def _get_diagnostics_service(hass: HomeAssistant, entry_id: str) -> None:
         _LOGGER.error("SolarGuardian integration not found")
         return
 
-    coordinator: SolarGuardianDataUpdateCoordinator = hass.data[DOMAIN][entry_id]["coordinator"]
+    coordinator: SolarGuardianDataUpdateCoordinator = hass.data[DOMAIN][entry_id][
+        "coordinator"
+    ]
     api: SolarGuardianAPI = hass.data[DOMAIN][entry_id]["api"]
 
     _LOGGER.info("📋 SolarGuardian Integration Diagnostics")
     _LOGGER.info("🔧 API Domain: %s", api.domain)
-    _LOGGER.info("🔧 App Key: %s...", api.app_key[:8] if len(api.app_key) > 8 else "***")
-    _LOGGER.info("⏱️  Update Interval: %s seconds", coordinator.update_interval.total_seconds())
+    _LOGGER.info(
+        "🔧 App Key: %s...", api.app_key[:8] if len(api.app_key) > 8 else "***"
+    )
+    _LOGGER.info(
+        "⏱️  Update Interval: %s seconds", coordinator.update_interval.total_seconds()
+    )
     _LOGGER.info("✅ Last Update Success: %s", coordinator.last_update_success)
     _LOGGER.info("🔄 Failed Updates: %d", coordinator._failed_updates)
     _LOGGER.info("📡 Latest Data Enabled: %s", not coordinator._latest_data_disabled)
     if coordinator._latest_data_disabled:
-        _LOGGER.info("   Latest data disabled after %d failures", coordinator._latest_data_failures)
+        _LOGGER.info(
+            "   Latest data disabled after %d failures",
+            coordinator._latest_data_failures,
+        )
 
     if coordinator.data:
         summary = coordinator.data.get("update_summary", {})
@@ -214,18 +237,26 @@ async def _reset_latest_data_service(hass: HomeAssistant, entry_id: str) -> None
         _LOGGER.error("SolarGuardian integration not found")
         return
 
-    coordinator: SolarGuardianDataUpdateCoordinator = hass.data[DOMAIN][entry_id]["coordinator"]
+    coordinator: SolarGuardianDataUpdateCoordinator = hass.data[DOMAIN][entry_id][
+        "coordinator"
+    ]
 
     old_disabled = coordinator._latest_data_disabled
     old_failures = coordinator._latest_data_failures
 
     coordinator._latest_data_disabled = False
     coordinator._latest_data_failures = 0
-    if hasattr(coordinator, '_successful_updates_since_disable'):
+    if hasattr(coordinator, "_successful_updates_since_disable"):
         coordinator._successful_updates_since_disable = 0
 
-    _LOGGER.info("🔄 Latest data fetching reset - was disabled: %s, failures: %d", old_disabled, old_failures)
-    _LOGGER.info("🔄 Latest data fetching is now enabled and will be tried on next update")
+    _LOGGER.info(
+        "🔄 Latest data fetching reset - was disabled: %s, failures: %d",
+        old_disabled,
+        old_failures,
+    )
+    _LOGGER.info(
+        "🔄 Latest data fetching is now enabled and will be tried on next update"
+    )
 
 
 async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -247,13 +278,21 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching SolarGuardian data from the API."""
 
-    def __init__(self, hass: HomeAssistant, api: SolarGuardianAPI, update_interval: int = DEFAULT_UPDATE_INTERVAL, test_mode: bool = False) -> None:
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        api: SolarGuardianAPI,
+        update_interval: int = DEFAULT_UPDATE_INTERVAL,
+        test_mode: bool = False,
+    ) -> None:
         """Initialize."""
         self.api = api
         self.test_mode = test_mode
         self._failed_updates = 0
         self._max_failed_updates = 3
-        self._latest_data_disabled = False  # Flag to disable latest data after repeated failures
+        self._latest_data_disabled = (
+            False  # Flag to disable latest data after repeated failures
+        )
         self._latest_data_failures = 0
         self._max_latest_data_failures = 5
         super().__init__(
@@ -272,26 +311,18 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
         mock_data = {
             "power_stations": {
                 "status": 0,
-                "data": {
-                    "list": [MOCK_POWER_STATION],
-                    "total": 1
-                }
+                "data": {"list": [MOCK_POWER_STATION], "total": 1},
             },
             "devices": {
                 MOCK_POWER_STATION["id"]: {
                     "status": 0,
-                    "data": {
-                        "list": [MOCK_DEVICE],
-                        "total": 1
-                    }
+                    "data": {"list": [MOCK_DEVICE], "total": 1},
                 }
             },
             "device_data": {
                 MOCK_DEVICE["id"]: {
                     "status": 0,
-                    "data": {
-                        "variableGroupList": MOCK_VARIABLE_GROUPS
-                    }
+                    "data": {"variableGroupList": MOCK_VARIABLE_GROUPS},
                 }
             },
             "status": "mock_mode",
@@ -300,9 +331,11 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
             "update_summary": {
                 "stations": 1,
                 "devices": 1,
-                "sensors": sum(len(group["variableList"]) for group in MOCK_VARIABLE_GROUPS),
-                "errors": ["Using mock data due to API connectivity issues"]
-            }
+                "sensors": sum(
+                    len(group["variableList"]) for group in MOCK_VARIABLE_GROUPS
+                ),
+                "errors": ["Using mock data due to API connectivity issues"],
+            },
         }
 
         return mock_data
@@ -325,14 +358,19 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
             # Get power stations
             try:
                 power_stations = await self.api.get_power_stations()
-                _LOGGER.debug("Power stations response: %s", power_stations.get("status"))
+                _LOGGER.debug(
+                    "Power stations response: %s", power_stations.get("status")
+                )
             except Exception as ps_err:
                 _LOGGER.error("Failed to get power stations: %s", ps_err)
                 raise UpdateFailed(f"Power stations error: {ps_err}") from ps_err
 
             if not power_stations.get("data", {}).get("list"):
                 _LOGGER.warning("No power stations found in response")
-                return {"status": "no_stations", "message": "No power stations available"}
+                return {
+                    "status": "no_stations",
+                    "message": "No power stations available",
+                }
 
             stations_list = power_stations.get("data", {}).get("list", [])
             _LOGGER.info("Found %d power stations", len(stations_list))
@@ -347,43 +385,59 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
                     "stations": len(stations_list),
                     "devices": 0,
                     "sensors": 0,
-                    "errors": []
-                }
+                    "errors": [],
+                },
             }
 
             # Get devices for each power station
             for station in stations_list:
                 station_id = station["id"]
                 station_name = station.get("powerStationName", f"Station {station_id}")
-                _LOGGER.debug("Processing station: %s (ID: %s)", station_name, station_id)
+                _LOGGER.debug(
+                    "Processing station: %s (ID: %s)", station_name, station_id
+                )
 
                 try:
                     # Get devices using the proper API method
-                    devices = await self.api.get_devices(station_id, page_no=1, page_size=100)
+                    devices = await self.api.get_devices(
+                        station_id, page_no=1, page_size=100
+                    )
                     data["devices"][station_id] = devices
 
                     devices_list = devices.get("data", {}).get("list", [])
                     data["update_summary"]["devices"] += len(devices_list)
-                    _LOGGER.debug("Found %d devices for station %s", len(devices_list), station_name)
+                    _LOGGER.debug(
+                        "Found %d devices for station %s",
+                        len(devices_list),
+                        station_name,
+                    )
 
                     # Get device parameters for each device
                     for device in devices_list:
                         device_id = device["id"]
                         device_name = device.get("equipmentName", f"Device {device_id}")
-                        _LOGGER.debug("Processing device: %s (ID: %s)", device_name, device_id)
+                        _LOGGER.debug(
+                            "Processing device: %s (ID: %s)", device_name, device_id
+                        )
 
                         try:
-                            device_data = await self.api.get_device_parameters(device_id)
+                            device_data = await self.api.get_device_parameters(
+                                device_id
+                            )
                             data["device_data"][device_id] = device_data
 
                             # Count parameters
                             param_count = 0
-                            variable_groups = device_data.get("data", {}).get("variableGroupList", [])
+                            variable_groups = device_data.get("data", {}).get(
+                                "variableGroupList", []
+                            )
                             for group in variable_groups:
                                 param_count += len(group.get("variableList", []))
 
                             data["update_summary"]["sensors"] += param_count
-                            _LOGGER.debug("Device %s has %d parameters", device_name, param_count)
+                            _LOGGER.debug(
+                                "Device %s has %d parameters", device_name, param_count
+                            )
 
                             # Get latest data for real-time values (only if device data was successful and not disabled)
                             if variable_groups and not self._latest_data_disabled:
@@ -393,19 +447,35 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
                                         data_point_id = variable.get("dataPointId")
                                         device_no = variable.get("deviceNo")
                                         if data_point_id and device_no:
-                                            dev_datapoints.append({
-                                                "dataPointId": data_point_id,
-                                                "deviceNo": device_no
-                                            })
+                                            dev_datapoints.append(
+                                                {
+                                                    "dataPointId": data_point_id,
+                                                    "deviceNo": device_no,
+                                                }
+                                            )
 
                                 if dev_datapoints:
                                     try:
                                         # Use the correct method with dataPointId and deviceNo
-                                        _LOGGER.debug("Fetching latest data for device %s with %d datapoints", device_name, len(dev_datapoints))
-                                        latest_data = await self.api.get_latest_data_by_datapoints(dev_datapoints)
-                                        data["device_data"][device_id]["latest_data"] = latest_data
-                                        latest_count = len(latest_data.get("data", {}).get("list", []))
-                                        _LOGGER.debug("Retrieved %d latest values for device %s", latest_count, device_name)
+                                        _LOGGER.debug(
+                                            "Fetching latest data for device %s with %d datapoints",
+                                            device_name,
+                                            len(dev_datapoints),
+                                        )
+                                        latest_data = await self.api.get_latest_data_by_datapoints(
+                                            dev_datapoints
+                                        )
+                                        data["device_data"][device_id][
+                                            "latest_data"
+                                        ] = latest_data
+                                        latest_count = len(
+                                            latest_data.get("data", {}).get("list", [])
+                                        )
+                                        _LOGGER.debug(
+                                            "Retrieved %d latest values for device %s",
+                                            latest_count,
+                                            device_name,
+                                        )
                                         # Reset failure counter on success
                                         self._latest_data_failures = 0
                                     except SolarGuardianAPIError as latest_err:
@@ -413,24 +483,45 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
                                         _LOGGER.warning(error_msg)
 
                                         # Track failures and disable if too many
-                                        if "404" in str(latest_err) or "inner error" in str(latest_err).lower():
+                                        if (
+                                            "404" in str(latest_err)
+                                            or "inner error" in str(latest_err).lower()
+                                        ):
                                             self._latest_data_failures += 1
-                                            if self._latest_data_failures >= self._max_latest_data_failures:
+                                            if (
+                                                self._latest_data_failures
+                                                >= self._max_latest_data_failures
+                                            ):
                                                 self._latest_data_disabled = True
-                                                _LOGGER.warning("Latest data endpoint consistently failing (%d failures), disabling", self._latest_data_failures)
+                                                _LOGGER.warning(
+                                                    "Latest data endpoint consistently failing (%d failures), disabling",
+                                                    self._latest_data_failures,
+                                                )
                                         else:
-                                            data["update_summary"]["errors"].append(error_msg)
+                                            data["update_summary"]["errors"].append(
+                                                error_msg
+                                            )
                                     except Exception as latest_err:
                                         error_msg = f"Failed to get latest data for device {device_name}: {latest_err}"
                                         _LOGGER.warning(error_msg)
-                                        data["update_summary"]["errors"].append(error_msg)
+                                        data["update_summary"]["errors"].append(
+                                            error_msg
+                                        )
                                 else:
-                                    _LOGGER.debug("No dataPointId/deviceNo found for device %s, skipping latest data", device_name)
+                                    _LOGGER.debug(
+                                        "No dataPointId/deviceNo found for device %s, skipping latest data",
+                                        device_name,
+                                    )
                             elif self._latest_data_disabled:
-                                _LOGGER.debug("Latest data fetching disabled for device %s due to repeated failures", device_name)
+                                _LOGGER.debug(
+                                    "Latest data fetching disabled for device %s due to repeated failures",
+                                    device_name,
+                                )
 
                         except Exception as err:
-                            error_msg = f"Failed to get data for device {device_name}: {err}"
+                            error_msg = (
+                                f"Failed to get data for device {device_name}: {err}"
+                            )
                             _LOGGER.warning(error_msg)
                             data["update_summary"]["errors"].append(error_msg)
 
@@ -439,16 +530,18 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
                     _LOGGER.warning(error_msg)
                     data["update_summary"]["errors"].append(error_msg)
 
-                            # Reset failed counter on successful update
+                    # Reset failed counter on successful update
             self._failed_updates = 0
 
             # Periodically try to re-enable latest data if it was disabled
             if self._latest_data_disabled and data["update_summary"]["devices"] > 0:
                 # Try to re-enable every 10 successful updates
-                if hasattr(self, '_successful_updates_since_disable'):
+                if hasattr(self, "_successful_updates_since_disable"):
                     self._successful_updates_since_disable += 1
                     if self._successful_updates_since_disable >= 10:
-                        _LOGGER.info("Re-enabling latest data fetching after successful updates")
+                        _LOGGER.info(
+                            "Re-enabling latest data fetching after successful updates"
+                        )
                         self._latest_data_disabled = False
                         self._latest_data_failures = 0
                         self._successful_updates_since_disable = 0
@@ -459,11 +552,16 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
             summary = data["update_summary"]
             _LOGGER.info(
                 "Update complete: %d stations, %d devices, %d sensors, %d errors",
-                summary["stations"], summary["devices"], summary["sensors"], len(summary["errors"])
+                summary["stations"],
+                summary["devices"],
+                summary["sensors"],
+                len(summary["errors"]),
             )
 
             if summary["errors"]:
-                _LOGGER.warning("Errors during update: %s", "; ".join(summary["errors"][:3]))
+                _LOGGER.warning(
+                    "Errors during update: %s", "; ".join(summary["errors"][:3])
+                )
 
             return data
 
@@ -471,16 +569,24 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
             self._failed_updates += 1
 
             # Log detailed error information
-            _LOGGER.error("Data update failed (attempt %d/%d): %s",
-                         self._failed_updates, self._max_failed_updates, err)
+            _LOGGER.error(
+                "Data update failed (attempt %d/%d): %s",
+                self._failed_updates,
+                self._max_failed_updates,
+                err,
+            )
 
             # If we've exceeded max failures and don't have any data, try mock mode
             if self._failed_updates >= self._max_failed_updates and not self.data:
-                _LOGGER.warning("Max failures reached and no data available, switching to mock mode")
+                _LOGGER.warning(
+                    "Max failures reached and no data available, switching to mock mode"
+                )
                 try:
                     mock_data = self._create_mock_data()
-                    _LOGGER.info("Mock data created successfully with %d sensors",
-                               mock_data["update_summary"]["sensors"])
+                    _LOGGER.info(
+                        "Mock data created successfully with %d sensors",
+                        mock_data["update_summary"]["sensors"],
+                    )
                     return mock_data
                 except Exception as mock_err:
                     _LOGGER.error("Failed to create mock data: %s", mock_err)
@@ -491,7 +597,8 @@ class SolarGuardianDataUpdateCoordinator(DataUpdateCoordinator):
                 self.update_interval = timedelta(seconds=300)  # 5 minutes
                 _LOGGER.warning(
                     "Multiple update failures (%d), increasing interval from %ds to 5 minutes",
-                    self._failed_updates, old_interval
+                    self._failed_updates,
+                    old_interval,
                 )
 
             raise UpdateFailed(f"Error communicating with API: {err}") from err

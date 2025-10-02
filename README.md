@@ -62,6 +62,7 @@ A comprehensive Home Assistant integration for Epever Solar inverters using the 
 ## Supported Entities
 
 ### Sensors
+
 - Power output (W)
 - AC/DC voltage (V)
 - AC/DC current (A)
@@ -71,6 +72,7 @@ A comprehensive Home Assistant integration for Epever Solar inverters using the 
 - Efficiency metrics
 
 ### Binary Sensors
+
 - Device online status
 - Alarm states
 - System health indicators
@@ -78,6 +80,7 @@ A comprehensive Home Assistant integration for Epever Solar inverters using the 
 ## API Rate Limits
 
 The integration respects SolarGuardian API rate limits:
+
 - 30 API calls per minute for data requests
 - 10 calls per minute for authentication
 - Automatic retry with exponential backoff

@@ -7,6 +7,7 @@
 **Location**: `custom_components/solarguardian/sensor.py`, line 410
 
 **Reported in Home Assistant logs**:
+
 ```
 Error while setting up solarguardian platform for sensor
 File "/config/custom_components/solarguardian/sensor.py", line 410, in _setup_sensors_from_data
@@ -20,6 +21,7 @@ UnboundLocalError: cannot access local variable 'device_sensors' where it is not
 In the `_setup_sensors_from_data()` function, the variable `device_sensors` was being incremented **before** it was initialized.
 
 **Problematic Code Order**:
+
 ```python
 # Line 387-410: Device info sensors loop
 for sensor_id, sensor_value in device_info_sensors:
@@ -36,6 +38,7 @@ device_sensors = 0  # ❌ TOO LATE!
 Moved the initialization of `device_sensors = 0` to **before** the device info sensors loop.
 
 **Fixed Code Order**:
+
 ```python
 # Line 388: Initialize FIRST
 device_sensors = 0  # ✅ CORRECT: Initialize before use
@@ -51,12 +54,13 @@ for sensor_id, sensor_value in device_info_sensors:
 
 **File**: `custom_components/solarguardian/sensor.py`
 
-**Line 388**: Added `device_sensors = 0` initialization  
+**Line 388**: Added `device_sensors = 0` initialization
 **Line 413**: Removed duplicate `device_sensors = 0` (no longer needed)
 
 ## Testing
 
 After this fix:
+
 1. ✅ Variable is properly initialized before use
 2. ✅ Device info sensors can increment the counter
 3. ✅ Parameter sensors can continue incrementing
@@ -64,8 +68,8 @@ After this fix:
 
 ## Deployment
 
-**Commit**: `d9206a8`  
-**Branch**: `master`  
+**Commit**: `d9206a8`
+**Branch**: `master`
 **Status**: ✅ Pushed to origin/master
 
 ## Impact
@@ -83,6 +87,7 @@ After this fix:
 4. Confirm no UnboundLocalError messages
 
 Expected log output:
+
 ```
 Successfully set up X sensors for device Y
 ```
@@ -95,7 +100,7 @@ Successfully set up X sensors for device Y
 
 ---
 
-**Status**: ✅ **FIXED**  
-**Committed**: October 1, 2025  
-**Pushed**: Yes  
+**Status**: ✅ **FIXED**
+**Committed**: October 1, 2025
+**Pushed**: Yes
 **Ready for Deployment**: Yes

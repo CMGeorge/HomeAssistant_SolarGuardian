@@ -16,11 +16,12 @@ Implemented comprehensive rate limit protection to prevent API restrictions from
 # Before
 vol.Range(min=5, max=300)
 
-# After  
+# After
 vol.Range(min=15, max=300)
 ```
 
 **Rationale**:
+
 - 5-second interval with single device = 48 calls/minute (exceeds 30/min limit by 60%)
 - 15-second interval with single device = 16 calls/minute (safe)
 - Provides buffer for rate limiting delays
@@ -40,6 +41,7 @@ DEFAULT_UPDATE_INTERVAL = 15  # seconds - safe for most installations, respects 
 ```
 
 **Impact**:
+
 - New installations will use safer default
 - Existing installations keep their configured value
 - Users can still adjust down to 15s if they have single device
@@ -64,11 +66,13 @@ if data.get("status") == 5126:
 ```
 
 **Applied to**:
+
 - `_make_authenticated_request()` - main data endpoint handler
 - `get_latest_data()` - legacy latest data method
 - `get_latest_data_by_datapoints()` - current latest data method
 
 **Benefits**:
+
 - Clear user-facing error messages
 - Actionable guidance (increase interval)
 - Longer backoff time (10s vs 5s)
@@ -114,21 +118,23 @@ For a typical installation with 1 station and 1 device:
 
 ### Safe Configuration Guidelines
 
-| Setup | Min Interval | Recommended | Calls/Minute |
-|-------|-------------|-------------|--------------|
-| 1 station, 1 device | 15s | 15-20s | 16-20 |
-| 1 station, 2-3 devices | 20s | 30s | 20-30 |
-| 2+ stations or 4+ devices | 30s | 60s | 15-30 |
-| Large (3+ stations, 6+ devices) | 60s | 120s | 15-20 |
+| Setup                           | Min Interval | Recommended | Calls/Minute |
+| ------------------------------- | ------------ | ----------- | ------------ |
+| 1 station, 1 device             | 15s          | 15-20s      | 16-20        |
+| 1 station, 2-3 devices          | 20s          | 30s         | 20-30        |
+| 2+ stations or 4+ devices       | 30s          | 60s         | 15-30        |
+| Large (3+ stations, 6+ devices) | 60s          | 120s        | 15-20        |
 
 ### Before vs After
 
 **Before (5s minimum)**:
+
 - 1 device @ 5s = 48 calls/min ❌ EXCEEDS LIMIT
 - 1 device @ 10s = 24 calls/min ⚠️ CLOSE TO LIMIT
 - 3 devices @ 10s = 90 calls/min ❌ SEVERELY EXCEEDS
 
 **After (15s minimum)**:
+
 - 1 device @ 15s = 16 calls/min ✅ SAFE
 - 1 device @ 20s = 12 calls/min ✅ VERY SAFE
 - 3 devices @ 30s = 30 calls/min ✅ AT LIMIT (with guidance to increase)
@@ -152,6 +158,7 @@ async def _rate_limit_data(self) -> None:
 ```
 
 **Features**:
+
 - Enforces minimum 2-second spacing between data calls
 - Enforces minimum 6-second spacing between auth calls
 - Uses asyncio lock to prevent race conditions
@@ -182,12 +189,14 @@ async def _rate_limit_data(self) -> None:
 ### After Deployment
 
 Monitor Home Assistant logs for:
+
 ```
 API rate limit exceeded! The integration is making too many requests.
 Please increase the update interval in integration options
 ```
 
 If seen, increase update interval:
+
 - Single device: 20s
 - 2-3 devices: 45s
 - 4+ devices: 90s
@@ -197,26 +206,30 @@ If seen, increase update interval:
 ### Existing Users
 
 Users with existing installations will **not** be affected immediately:
+
 - Their configured interval is preserved
 - Only new installations get 15s default
 
 **If they reconfigure**:
+
 - Minimum is now 15s (was 5s)
 - If they had 5-14s configured, they'll need to adjust to 15s minimum
 
 ### Communication
 
 Consider adding to release notes:
+
 ```markdown
 ## Breaking Changes
 
 **Minimum update interval increased from 5s to 15s**
 
-To comply with SolarGuardian API rate limits (30 calls/minute), the minimum 
-update interval has been increased to 15 seconds. Users who previously 
+To comply with SolarGuardian API rate limits (30 calls/minute), the minimum
+update interval has been increased to 15 seconds. Users who previously
 configured intervals below 15s will need to adjust their settings.
 
 Recommended intervals:
+
 - Single device: 15-20 seconds
 - Multiple devices: 30+ seconds
 - Large installations: 60+ seconds
@@ -249,6 +262,7 @@ Recommended intervals:
 ## Next Steps
 
 1. **Test the changes** with real API credentials:
+
    ```bash
    cd tests
    .venv/bin/python run_real_api_tests.py
@@ -275,17 +289,20 @@ Recommended intervals:
 **Risk Level**: Low
 
 **Mitigations**:
+
 - Changes only affect new installations and reconfigurations
 - Existing users keep their settings
 - Rate limiting code already working correctly
 - Clear error messages guide users
 
 **Potential Issues**:
+
 - Users may notice less frequent updates (15s vs 10s default)
 - Users with <15s configured will need to reconfigure
 - Some users may want more frequent updates
 
 **Solutions**:
+
 - Document the change clearly
 - Explain the reasoning (API limits)
 - Provide clear configuration guidelines
@@ -293,6 +310,6 @@ Recommended intervals:
 
 ---
 
-**Status**: ✅ **COMPLETE**  
-**Last Updated**: October 1, 2025  
+**Status**: ✅ **COMPLETE**
+**Last Updated**: October 1, 2025
 **Tested**: Awaiting deployment test

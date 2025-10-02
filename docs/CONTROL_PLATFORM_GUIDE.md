@@ -1,7 +1,7 @@
 # Control Platform Implementation Guide
 
-**Date**: October 1, 2025  
-**Status**: 📋 Ready for Implementation  
+**Date**: October 1, 2025
+**Status**: 📋 Ready for Implementation
 **Priority**: HIGH - Adds missing functionality
 
 ## Executive Summary
@@ -12,8 +12,8 @@ The configuration parameters showing "Unknown" are actually **writable parameter
 
 ### What the API Provides
 
-✅ **Write/Control**: Command issuing endpoint (Section 6 of API docs)  
-⚠️ **Read Current Values**: Not directly available (use optimistic mode)  
+✅ **Write/Control**: Command issuing endpoint (Section 6 of API docs)
+⚠️ **Read Current Values**: Not directly available (use optimistic mode)
 ✅ **Parameter Definitions**: Already have (names, ranges, translations)
 
 ### API Command Endpoint
@@ -43,7 +43,7 @@ Rate Limit: 10 commands/second
 ## Questions for You
 
 1. **Do you want controls implemented?** (Yes/No/Maybe)
-2. **Priority level?** (Immediate/Soon/Eventually)  
+2. **Priority level?** (Immediate/Soon/Eventually)
 3. **Willing to test with your device?** (Required for implementation)
 4. **Which controls are most important to you?**
 
@@ -54,37 +54,46 @@ See full implementation details below ⬇️
 ## Controllable Parameters (44 total)
 
 ### Battery Settings (5 controls)
+
 - Battery Type → **Select**: User/Lithium/Lead-acid
-- Battery Capacity → **Number**: 50-1000 Ah  
+- Battery Capacity → **Number**: 50-1000 Ah
 - Battery Detection, BMS, Protocol → **Switch/Select**
 
-### Charging Voltages (7 controls) ⚠️ CRITICAL  
+### Charging Voltages (7 controls) ⚠️ CRITICAL
+
 - Bulk/Float/Equalize Voltages → **Number**: 48-64 V
 - Charging Limit, Recovery → **Number**
 
 ### Protection Settings (5 controls) ⚠️ CRITICAL
+
 - Low Voltage Disconnect/Recovery → **Number**: 40-52 V
 - Undervoltage Alarms → **Number**
 
 ### Current Limits (3 controls)
+
 - Charging/Discharging Currents → **Number**: 0-200 A
 
 ### Operating Modes (4 controls)
+
 - Charging Mode → **Select**: Solar First/Utility First/etc.
 - Output Mode, Load Control → **Select**
 
 ### Switches (6 controls)
+
 - Load Switch, Buzzer, PV Control → **Switch**: On/Off
 
 ### Temperature (4 controls)
+
 - Temp Compensation, Unit, Limits → **Number/Select**
 
-### Timing/Misc (10 controls)  
+### Timing/Misc (10 controls)
+
 - Charge Times, LCD Timeout, Device Time, etc.
 
 ## Implementation Plan
 
 ### Phase 1: API Client (2 hours)
+
 ```python
 # api.py - Add methods
 async def get_command_server_address() -> str
@@ -92,6 +101,7 @@ async def send_command(gateway_id, slave_name, datapoint_id, value) -> bool
 ```
 
 ### Phase 2: Number Platform (4 hours)
+
 ```python
 # number.py - NEW FILE
 class SolarGuardianNumber(CoordinatorEntity, NumberEntity):
@@ -100,8 +110,9 @@ class SolarGuardianNumber(CoordinatorEntity, NumberEntity):
 ```
 
 ### Phase 3: Select Platform (4 hours)
+
 ```python
-# select.py - NEW FILE  
+# select.py - NEW FILE
 class SolarGuardianSelect(CoordinatorEntity, SelectEntity):
     async def async_select_option(option):
         value = translate_option_to_value(option)
@@ -109,6 +120,7 @@ class SolarGuardianSelect(CoordinatorEntity, SelectEntity):
 ```
 
 ### Phase 4: Switch Platform (2 hours)
+
 ```python
 # switch.py - NEW FILE
 class SolarGuardianSwitch(CoordinatorEntity, SwitchEntity):
@@ -117,15 +129,17 @@ class SolarGuardianSwitch(CoordinatorEntity, SwitchEntity):
 ```
 
 ### Phase 5: Safety & Config (3 hours)
+
 - Add "Enable Controls" option (default: OFF)
 - Show safety warning when enabling
 - Mark critical parameters with warnings
 - Add validation for voltage/current ranges
 
 ### Phase 6: Testing & Docs (6 hours)
+
 - Test API calls with real device
 - Start with safe parameters (LCD, Buzzer)
-- Test critical parameters carefully  
+- Test critical parameters carefully
 - Write user documentation
 
 **Total**: 21 hours
@@ -133,6 +147,7 @@ class SolarGuardianSwitch(CoordinatorEntity, SwitchEntity):
 ## Safety Implementation
 
 ### Critical Parameters
+
 ```python
 CRITICAL_PARAMETERS = {
     "VTYPE": "Battery Type - FIRE RISK",
@@ -143,6 +158,7 @@ CRITICAL_PARAMETERS = {
 ```
 
 ### Configuration Warning
+
 ```
 ⚠️ WARNING: Device controls allow changing inverter settings.
 
@@ -156,6 +172,7 @@ Only enable if you understand your equipment!
 ```
 
 ### Entity Safety
+
 - Mark critical entities with `EntityCategory.CONFIG`
 - Show warning icon on critical controls
 - Log all critical parameter changes
@@ -164,6 +181,7 @@ Only enable if you understand your equipment!
 ## Testing Strategy
 
 1. **API Testing** (safe, no device changes)
+
    ```python
    # Test getting command server address
    # Test command format (don't send yet)
@@ -182,17 +200,20 @@ Only enable if you understand your equipment!
 ## User Documentation
 
 ### Enable Controls
+
 1. Configuration → Integrations → SolarGuardian → Configure
-2. Enable "Device Controls"  
+2. Enable "Device Controls"
 3. Read and accept warning
 4. Restart Home Assistant
 
 ### Control Entities Appear
+
 - **number.solar_inverter_bulk_voltage** (48.0-58.4 V)
 - **select.solar_inverter_charging_mode** (Solar First/Utility First/etc.)
 - **switch.solar_inverter_load_switch** (On/Off)
 
 ### Use Controls
+
 ```yaml
 # Set charging voltage
 service: number.set_value
@@ -212,6 +233,7 @@ data:
 **Problem**: API can write values but doesn't provide easy way to read them back
 
 **Solution**: Optimistic mode
+
 - When user sets value, immediately update entity state
 - Don't wait for confirmation from device
 - If command fails, log error and restore previous state
@@ -231,4 +253,3 @@ This is standard HA pattern for write-only controls!
 4. Which controls do you want most?
 
 If yes, I can start with Phase 1 (API client) right away!
-
