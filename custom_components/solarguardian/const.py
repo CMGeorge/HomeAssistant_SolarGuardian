@@ -78,7 +78,7 @@ MOCK_VARIABLE_GROUPS = [
                 "deviceNo": "2023021512345678900001"
             },
             {
-                "dataIdentifier": "InputPower", 
+                "dataIdentifier": "InputPower",
                 "variableNameE": "Input Power",
                 "variableNameC": "输入功率",
                 "unit": "W",
@@ -90,7 +90,7 @@ MOCK_VARIABLE_GROUPS = [
                 "dataIdentifier": "loadpower",
                 "variableNameE": "Load Power",
                 "variableNameC": "负载功率",
-                "unit": "W", 
+                "unit": "W",
                 "decimal": "0",
                 "dataPointId": 101754262,
                 "deviceNo": "2023021512345678900001"
@@ -112,7 +112,7 @@ MOCK_VARIABLE_GROUPS = [
             },
             {
                 "dataIdentifier": "InputVoltage",
-                "variableNameE": "Input Voltage", 
+                "variableNameE": "Input Voltage",
                 "variableNameC": "输入电压",
                 "unit": "V",
                 "decimal": "1",
@@ -132,7 +132,7 @@ MOCK_VARIABLE_GROUPS = [
     },
     {
         "variableGroupNameE": "Current Parameters",
-        "variableGroupNameC": "电流参数", 
+        "variableGroupNameC": "电流参数",
         "variableList": [
             {
                 "dataIdentifier": "OutputCurrent",
@@ -146,7 +146,7 @@ MOCK_VARIABLE_GROUPS = [
             {
                 "dataIdentifier": "InputCurrent",
                 "variableNameE": "Input Current",
-                "variableNameC": "输入电流", 
+                "variableNameC": "输入电流",
                 "unit": "A",
                 "decimal": "2",
                 "dataPointId": 101754267,

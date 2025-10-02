@@ -9,7 +9,6 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     UnitOfElectricCurrent,
@@ -19,6 +18,7 @@ from homeassistant.const import (
     UnitOfTemperature,
 )
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -336,8 +336,6 @@ async def async_setup_entry(
         config_entry.entry_id
     ]["coordinator"]
 
-    entities = []
-
     # Check if we have data
     if not coordinator.data:
         _LOGGER.warning("No initial data available for sensor setup")
@@ -346,7 +344,7 @@ async def async_setup_entry(
             if coordinator.data and coordinator.data.get("devices"):
                 _LOGGER.info("Data now available, setting up sensors")
                 await _setup_sensors_from_data(coordinator, async_add_entities)
-        
+
         # Listen for data updates
         coordinator.async_add_listener(_async_data_updated)
         return
@@ -361,22 +359,22 @@ async def _setup_sensors_from_data(
 ) -> None:
     """Set up sensors from coordinator data."""
     entities = []
-    
+
     # Check for connection status information
     data_status = coordinator.data.get("status", "unknown")
     _LOGGER.info("Setting up sensors with data status: %s", data_status)
-    
+
     if data_status == "no_stations":
         _LOGGER.warning("No power stations available - sensors cannot be created")
         return
-    
+
     # Log summary information
     summary = coordinator.data.get("update_summary", {})
     if summary:
         _LOGGER.info(
-            "Data summary: %d stations, %d devices, %d sensors", 
-            summary.get("stations", 0), 
-            summary.get("devices", 0), 
+            "Data summary: %d stations, %d devices, %d sensors",
+            summary.get("stations", 0),
+            summary.get("devices", 0),
             summary.get("sensors", 0)
         )
 
@@ -384,7 +382,7 @@ async def _setup_sensors_from_data(
     for station_id, devices in coordinator.data.get("devices", {}).items():
         station_devices = devices.get("data", {}).get("list", [])
         _LOGGER.debug("Processing %d devices from station %s", len(station_devices), station_id)
-        
+
         for device in station_devices:
             device_id = device["id"]
             device_name = device.get("equipmentName", f"Device {device_id}")
@@ -407,7 +405,7 @@ async def _setup_sensors_from_data(
                 ("_device_location", device.get("address", "Unknown")),
                 ("_device_status_text", "Online" if device.get("status") == 1 else "Offline"),
             ]
-            
+
             for sensor_id, sensor_value in device_info_sensors:
                 if sensor_id in SENSOR_TYPES and sensor_value != "Unknown":
                     entities.append(
@@ -428,7 +426,7 @@ async def _setup_sensors_from_data(
                     data_identifier = variable.get("dataIdentifier")
                     if not data_identifier:
                         continue
-                    
+
                     # Skip configuration parameters (mode="1")
                     # These are device settings that are not provided by the latest_data endpoint
                     # mode="0" = real-time sensor (has values)
@@ -440,7 +438,7 @@ async def _setup_sensors_from_data(
                             variable.get("variableNameE", data_identifier)
                         )
                         continue
-                        
+
                     if data_identifier in SENSOR_TYPES:
                         entities.append(
                             SolarGuardianSensor(
@@ -454,7 +452,7 @@ async def _setup_sensors_from_data(
                     else:
                         # Create generic sensor for unknown parameters
                         _LOGGER.debug(
-                            "Creating generic sensor for unknown parameter: %s in group %s", 
+                            "Creating generic sensor for unknown parameter: %s in group %s",
                             data_identifier, group_name
                         )
                         entities.append(
@@ -470,7 +468,7 @@ async def _setup_sensors_from_data(
                             )
                         )
                         device_sensors += 1
-            
+
             _LOGGER.info("Created %d sensors for device %s", device_sensors, device_name)
 
     _LOGGER.info("Total sensors created: %d", len(entities))
@@ -490,16 +488,16 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
-        
+
         self._device = device
         self._variable = variable
         self._sensor_config = sensor_config
         self._attr_name = f"{device['equipmentName']} {sensor_config['name']}"
         self._attr_unique_id = f"{device['id']}_{variable['dataIdentifier']}"
-        
+
         # Check if this is an enum sensor (has translationChild)
         has_translation = bool(variable.get("translationChild"))
-        
+
         # Set sensor attributes
         # For enum sensors (text values), don't set device_class, state_class, or unit
         # This tells Home Assistant to treat them as text sensors
@@ -507,9 +505,9 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             self._attr_native_unit_of_measurement = sensor_config.get("unit")
             self._attr_device_class = sensor_config.get("device_class")
             self._attr_state_class = sensor_config.get("state_class")
-        
+
         self._attr_icon = sensor_config.get("icon")
-        
+
         # Device info
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device["id"]))},
@@ -521,22 +519,22 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
 
     def _translate_value(self, value: float, translation_child: list) -> str | None:
         """Translate numeric value to text using translationChild mappings.
-        
+
         Args:
             value: Numeric value from sensor (e.g., 0, 1, 2)
             translation_child: List of translation mappings from API
-            
+
         Returns:
             Translated text value (e.g., "Not Charging") or None if no match
         """
         # Convert value to string for comparison (API uses string values in translations)
         value_str = str(int(value))  # Convert 0.0 to "0", 1.0 to "1", etc.
-        
+
         for translation in translation_child:
             if translation.get("value") == value_str:
                 # Use English result if available, fallback to Chinese
                 return translation.get("resultE") or translation.get("result")
-        
+
         # No translation found
         return None
 
@@ -546,14 +544,14 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         device_id = self._device["id"]
         device_name = self._device.get("equipmentName", "Unknown")
         device_data = self.coordinator.data.get("device_data", {}).get(device_id, {})
-        
+
         if not device_data:
             _LOGGER.debug("No device data available for %s (ID: %s)", device_name, device_id)
             return None
 
         data_identifier = self._variable["dataIdentifier"]
         data_point_id = self._variable.get("dataPointId")
-        
+
         # First try to get value from latest data
         # NOTE: latest_data response uses dataPointId, not dataIdentifier!
         latest_data = device_data.get("latest_data", {})
@@ -564,7 +562,7 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                         # NOTE: latest_data values are ALREADY formatted with decimals applied
                         # The API returns "50.00" not "5000", so we use the value as-is
                         value = float(data_point.get("value", 0))
-                        
+
                         # Check if this parameter has translation mappings (enum values)
                         translation_child = self._variable.get("translationChild", [])
                         if translation_child:
@@ -580,7 +578,7 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                                 if hasattr(self, '_value_source'):
                                     self._value_source = "latest_data (translated)"
                                 return translated_value
-                        
+
                         _LOGGER.debug(
                             "Sensor %s (%s) got value from latest_data: %s",
                             self.name, data_identifier, value
@@ -628,7 +626,7 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
                             except (ValueError, TypeError):
                                 # Try returning as-is if not numeric
                                 return variable[value_field]
-        
+
         # Log when we can't find any value
         # Check if attribute exists (backward compatibility with existing sensors)
         if hasattr(self, '_last_valid_value') and self._last_valid_value is not None:
@@ -640,7 +638,7 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             if hasattr(self, '_value_source'):
                 self._value_source = "last_known (stale)"
             return self._last_valid_value
-        
+
         _LOGGER.debug(
             "No value found for sensor %s (%s) in device %s - parameter not in latest_data",
             self.name, data_identifier, device_name
@@ -655,14 +653,14 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
         # If coordinator has never successfully updated, entity is unavailable
         if not self.coordinator.last_update_success and not self.coordinator.data:
             return False
-            
+
         # If we have data, check if our specific device data is available
         if self.coordinator.data:
             device_id = self._device["id"]
             device_data = self.coordinator.data.get("device_data", {}).get(device_id, {})
             # Entity is available if we have device data, even if latest update failed
             return bool(device_data)
-        
+
         # Fallback to coordinator success status
         return self.coordinator.last_update_success
 
@@ -683,13 +681,13 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             "variable_name": self._variable.get("variableName"),
             "data_source": getattr(self, '_value_source', None) or "none",
         }
-        
+
         # Add parameter info for diagnostic purposes
         if self._variable.get("dataPointId"):
             attrs["data_point_id"] = self._variable["dataPointId"]
         if self._variable.get("unit"):
             attrs["api_unit"] = self._variable["unit"]
-        
+
         # Show if parameter has real-time data available
         device_id = self._device["id"]
         device_data = self.coordinator.data.get("device_data", {}).get(device_id, {})
@@ -702,7 +700,7 @@ class SolarGuardianSensor(CoordinatorEntity, SensorEntity):
             attrs["has_latest_data"] = has_latest
             if not has_latest:
                 attrs["info"] = "Parameter not included in real-time updates"
-        
+
         return attrs
 
     @callback
@@ -724,17 +722,17 @@ class SolarGuardianDeviceInfoSensor(CoordinatorEntity, SensorEntity):
     ) -> None:
         """Initialize the device info sensor."""
         super().__init__(coordinator)
-        
+
         self._device = device
         self._sensor_id = sensor_id
         self._sensor_config = sensor_config
         self._value = value
         self._attr_name = f"{device['equipmentName']} {sensor_config['name']}"
         self._attr_unique_id = f"{device['id']}{sensor_id}"
-        
+
         # Set sensor attributes (text sensors have no unit/device_class)
         self._attr_icon = sensor_config.get("icon")
-        
+
         # Device info
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device["id"]))},
@@ -750,8 +748,8 @@ class SolarGuardianDeviceInfoSensor(CoordinatorEntity, SensorEntity):
         # Update value from coordinator if device status changed
         device_id = self._device["id"]
         devices_data = self.coordinator.data.get("devices", {})
-        
-        for station_id, devices in devices_data.items():
+
+        for _station_id, devices in devices_data.items():
             for device in devices.get("data", {}).get("list", []):
                 if device["id"] == device_id:
                     # Update dynamic values
@@ -759,7 +757,7 @@ class SolarGuardianDeviceInfoSensor(CoordinatorEntity, SensorEntity):
                         return "Online" if device.get("status") == 1 else "Offline"
                     # For static values, return stored value
                     break
-        
+
         return self._value
 
     @property

@@ -36,13 +36,13 @@ async def async_setup_entry(
         return
 
     # Create binary sensors for each device
-    for station_id, devices in coordinator.data.get("devices", {}).items():
+    for _station_id, devices in coordinator.data.get("devices", {}).items():
         for device in devices.get("data", {}).get("list", []):
             # Device online status
             entities.append(
                 SolarGuardianDeviceStatusSensor(coordinator, device, "online")
             )
-            
+
             # Device alarm status
             entities.append(
                 SolarGuardianDeviceStatusSensor(coordinator, device, "alarm")
@@ -62,10 +62,10 @@ class SolarGuardianDeviceStatusSensor(CoordinatorEntity, BinarySensorEntity):
     ) -> None:
         """Initialize the binary sensor."""
         super().__init__(coordinator)
-        
+
         self._device = device
         self._sensor_type = sensor_type
-        
+
         if sensor_type == "online":
             self._attr_name = f"{device['equipmentName']} Online"
             self._attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
@@ -74,9 +74,9 @@ class SolarGuardianDeviceStatusSensor(CoordinatorEntity, BinarySensorEntity):
             self._attr_name = f"{device['equipmentName']} Alarm"
             self._attr_device_class = BinarySensorDeviceClass.PROBLEM
             self._attr_icon = "mdi:alert"
-        
+
         self._attr_unique_id = f"{device['id']}_{sensor_type}"
-        
+
         # Device info
         self._attr_device_info = {
             "identifiers": {(DOMAIN, str(device["id"]))},
@@ -90,9 +90,9 @@ class SolarGuardianDeviceStatusSensor(CoordinatorEntity, BinarySensorEntity):
     def is_on(self) -> bool | None:
         """Return true if the binary sensor is on."""
         device_id = self._device["id"]
-        
+
         # Look for device status in the current data
-        for station_id, devices in self.coordinator.data.get("devices", {}).items():
+        for _station_id, devices in self.coordinator.data.get("devices", {}).items():
             for device in devices.get("data", {}).get("list", []):
                 if device["id"] == device_id:
                     if self._sensor_type == "online":
@@ -101,7 +101,7 @@ class SolarGuardianDeviceStatusSensor(CoordinatorEntity, BinarySensorEntity):
                     elif self._sensor_type == "alarm":
                         # Check alarm status (1 = alarm, 0 = normal)
                         return device.get("datapointAlarm", 0) == 1
-        
+
         return None
 
     @property

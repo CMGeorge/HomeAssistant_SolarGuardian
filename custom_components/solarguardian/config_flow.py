@@ -6,21 +6,19 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.const import CONF_DOMAIN
 from homeassistant.data_entry_flow import FlowResult
 
 from .api import SolarGuardianAPI, SolarGuardianAPIError
 from .const import (
-    DOMAIN,
     CONF_APP_KEY,
     CONF_APP_SECRET,
-    CONF_DOMAIN,
     CONF_UPDATE_INTERVAL,
+    DEFAULT_UPDATE_INTERVAL,
+    DOMAIN,
     DOMAIN_CHINA,
     DOMAIN_INTERNATIONAL,
-    DEFAULT_UPDATE_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,7 +67,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         except SolarGuardianAPIError as err:
             _LOGGER.error("Authentication failed: %s", err)
             errors["base"] = "invalid_auth"
-        except Exception as err:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
 

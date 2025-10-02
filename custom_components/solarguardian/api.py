@@ -5,7 +5,6 @@ import asyncio
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any
 
 import aiohttp
 from aiohttp import ClientTimeout
@@ -13,10 +12,10 @@ from aiohttp import ClientTimeout
 from .const import (
     DEFAULT_TIMEOUT,
     ENDPOINT_AUTH,
-    ENDPOINT_POWER_STATIONS,
-    ENDPOINT_DEVICES,
     ENDPOINT_DEVICE_PARAMETERS,
+    ENDPOINT_DEVICES,
     ENDPOINT_LATEST_DATA,
+    ENDPOINT_POWER_STATIONS,
     LATEST_DATA_PORT,
 )
 
@@ -86,15 +85,15 @@ class SolarGuardianAPI:
             return True
 
         await self._rate_limit_auth()
-        
+
         session = await self._get_session()
         url = f"{self._base_url}{ENDPOINT_AUTH}"
-        
+
         payload = {
             "appKey": self.app_key,
             "appSecret": self.app_secret,
         }
-        
+
         headers = {
             "Content-Type": "application/json",
         }
@@ -105,33 +104,33 @@ class SolarGuardianAPI:
             async with session.post(url, json=payload, headers=headers) as response:
                 response_text = await response.text()
                 _LOGGER.debug("Auth response status: %s", response.status)
-                
+
                 if response.status != 200:
                     _LOGGER.error("Authentication failed - HTTP %s: %s", response.status, response_text[:200])
                     raise SolarGuardianAPIError(f"Authentication failed: HTTP {response.status}")
-                
+
                 try:
                     data = json.loads(response_text)
                 except json.JSONDecodeError as json_err:
                     _LOGGER.error("Invalid JSON response from auth endpoint: %s", response_text[:200])
                     raise SolarGuardianAPIError(f"Invalid JSON response: {json_err}") from json_err
-                
+
                 if data.get("status") != 0:
                     error_info = data.get('info', 'Unknown error')
                     _LOGGER.error("Authentication API error - status: %s, info: %s", data.get("status"), error_info)
                     raise SolarGuardianAPIError(f"Authentication error: {error_info}")
-                
+
                 if "data" not in data or "X-Access-Token" not in data["data"]:
                     _LOGGER.error("Missing token in auth response: %s", data)
                     raise SolarGuardianAPIError("Authentication response missing access token")
-                
+
                 self._token = data["data"]["X-Access-Token"]
                 # Token expires in 2 hours
                 self._token_expires = datetime.now() + timedelta(hours=2)
-                
+
                 _LOGGER.info("Successfully authenticated with SolarGuardian API")
                 return True
-                
+
         except aiohttp.ClientError as err:
             _LOGGER.error("Network error during authentication: %s", err)
             # Check for specific connection errors
@@ -148,10 +147,10 @@ class SolarGuardianAPI:
         """Make an authenticated request to the API."""
         await self.authenticate()
         await self._rate_limit_data()
-        
+
         session = await self._get_session()
         url = f"{self._base_url}{endpoint}"
-        
+
         headers = {
             "Content-Type": "application/json",
             "X-Access-Token": self._token,
@@ -161,9 +160,9 @@ class SolarGuardianAPI:
             async with session.post(url, json=payload or {}, headers=headers) as response:
                 if response.status != 200:
                     raise SolarGuardianAPIError(f"API request failed: {response.status}")
-                
+
                 data = await response.json()
-                
+
                 if data.get("status") != 0:
                     error_msg = data.get("info", "Unknown error")
                     if data.get("status") == 5126:  # Too frequent requests
@@ -171,9 +170,9 @@ class SolarGuardianAPI:
                         _LOGGER.error("Please increase the update interval in integration options (recommended: 30+ seconds for multiple devices).")
                         await asyncio.sleep(10)  # Back off longer
                     raise SolarGuardianAPIError(f"API error: {error_msg}")
-                
+
                 return data
-                
+
         except aiohttp.ClientError as err:
             raise SolarGuardianAPIError(f"Network error: {err}") from err
         except json.JSONDecodeError as err:
@@ -185,7 +184,7 @@ class SolarGuardianAPI:
             "pageNo": page_no,
             "pageSize": page_size,
         }
-        
+
         return await self._make_authenticated_request(ENDPOINT_POWER_STATIONS, payload)
 
     async def get_devices(self, power_station_id: int, page_no: int = 1, page_size: int = 100) -> dict:
@@ -195,7 +194,7 @@ class SolarGuardianAPI:
             "pageNo": page_no,
             "pageSize": page_size,
         }
-        
+
         return await self._make_authenticated_request(ENDPOINT_DEVICES, payload)
 
     async def get_gateways(self, power_station_id: int, page_no: int = 1, page_size: int = 100) -> dict:
@@ -205,7 +204,7 @@ class SolarGuardianAPI:
             "pageNo": page_no,
             "pageSize": page_size,
         }
-        
+
         return await self._make_authenticated_request("/epCloud/vn/openApi/getGatewayListPage", payload)
 
     async def get_device_parameters(self, device_id: int) -> dict:
@@ -213,39 +212,39 @@ class SolarGuardianAPI:
         payload = {
             "id": device_id,
         }
-        
+
         return await self._make_authenticated_request(ENDPOINT_DEVICE_PARAMETERS, payload)
 
     async def get_latest_data(self, device_id: int, data_identifiers: list[str]) -> dict:
         """Get latest data for specific parameters.
-        
+
         Note: This endpoint uses port 7002 as specified in the API documentation.
         """
         if not data_identifiers:
             raise SolarGuardianAPIError("No data identifiers provided")
-        
+
         # Use the correct endpoint with port 7002 as specified in API docs
         await self.authenticate()
         await self._rate_limit_data()
-        
+
         session = await self._get_session()
-        
+
         # Parse domain to get host without protocol
         domain_parts = self.domain.replace("https://", "").replace("http://", "")
         latest_data_url = f"https://{domain_parts}:{LATEST_DATA_PORT}{ENDPOINT_LATEST_DATA}"
-        
+
         headers = {
             "Content-Type": "application/json",
             "X-Access-Token": self._token,
         }
-        
+
         payload = {
             "id": device_id,
             "dataIdentifiers": data_identifiers,
         }
-        
+
         _LOGGER.debug("Making latest data request to %s for device %d with %d identifiers", latest_data_url, device_id, len(data_identifiers))
-        
+
         try:
             async with session.post(latest_data_url, json=payload, headers=headers) as response:
                 if response.status != 200:
@@ -253,9 +252,9 @@ class SolarGuardianAPI:
                         _LOGGER.debug("Latest data endpoint not available (404 error)")
                         raise SolarGuardianAPIError(f"Latest data endpoint not available: HTTP {response.status}")
                     raise SolarGuardianAPIError(f"Latest data API request failed: {response.status}")
-                
+
                 data = await response.json()
-                
+
                 if data.get("status") != 0:
                     error_msg = data.get("info", "Unknown error")
                     if data.get("status") == 5126:  # Too frequent requests
@@ -263,54 +262,54 @@ class SolarGuardianAPI:
                         _LOGGER.error("Please increase the update interval in integration options (recommended: 30+ seconds for multiple devices).")
                         await asyncio.sleep(10)  # Back off longer
                     raise SolarGuardianAPIError(f"Latest data API error: {error_msg}")
-                
+
                 return data
-                
+
         except aiohttp.ClientError as err:
             raise SolarGuardianAPIError(f"Network error during latest data request: {err}") from err
         except json.JSONDecodeError as err:
             raise SolarGuardianAPIError(f"Invalid JSON response from latest data endpoint: {err}") from err
-    
+
     async def get_latest_data_by_datapoints(self, dev_datapoints: list[dict]) -> dict:
         """Get latest data using the correct API endpoint with dataPointId and deviceNo.
-        
+
         Args:
             dev_datapoints: List of dicts with 'dataPointId' and 'deviceNo' keys
-            
+
         Returns:
             API response with latest data
         """
         if not dev_datapoints:
             raise SolarGuardianAPIError("No data points provided")
-        
+
         # Use the correct endpoint with port 7002 as specified in API docs
         await self.authenticate()
         await self._rate_limit_data()
-        
+
         session = await self._get_session()
-        
+
         # Parse domain to get host without protocol
         domain_parts = self.domain.replace("https://", "").replace("http://", "")
         latest_data_url = f"https://{domain_parts}:{LATEST_DATA_PORT}{ENDPOINT_LATEST_DATA}"
-        
+
         headers = {
             "Content-Type": "application/json",
             "X-Access-Token": self._token,
         }
-        
+
         payload = {
             "devDatapoints": dev_datapoints
         }
-        
+
         _LOGGER.debug("Making latest data request to %s with %d data points", latest_data_url, len(dev_datapoints))
-        
+
         try:
             async with session.post(latest_data_url, json=payload, headers=headers) as response:
                 if response.status != 200:
                     raise SolarGuardianAPIError(f"Latest data API request failed: {response.status}")
-                
+
                 data = await response.json()
-                
+
                 if data.get("status") != 0:
                     error_msg = data.get("info", "Unknown error")
                     if data.get("status") == 5126:  # Too frequent requests
@@ -318,9 +317,9 @@ class SolarGuardianAPI:
                         _LOGGER.error("Please increase the update interval in integration options (recommended: 30+ seconds for multiple devices).")
                         await asyncio.sleep(10)  # Back off longer
                     raise SolarGuardianAPIError(f"Latest data API error: {error_msg}")
-                
+
                 return data
-                
+
         except aiohttp.ClientError as err:
             raise SolarGuardianAPIError(f"Network error during latest data request: {err}") from err
         except json.JSONDecodeError as err:
